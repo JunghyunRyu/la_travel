@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LA 가족 여행 플래너 (Royal Palace Westwood)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #fdfaf6; /* Warm neutral background */
+            color: #333;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .tab-active {
+            border-bottom: 3px solid #f59e0b; /* Amber-500 */
+            color: #d97706; /* Amber-600 */
+            font-weight: 700;
+        }
+        .tab-inactive {
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-inactive:hover {
+            color: #374151;
+            border-bottom: 3px solid #e5e7eb;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals with Sunny Amber & Pacific Blue accents (Calm & Family Friendly) -->
+    <!-- Application Structure Plan: 
+         1. Header: Trip Summary & Key constraints (Child-friendly, Safety).
+         2. Interactive Dashboard: 
+            - Day Tabs (Day 1, 2, 3) to switch context.
+            - Left Column: Chronological Itinerary Cards with "Child Focus" tips.
+            - Right Column: Dynamic visualizations.
+                a. "Route Map" (Plotly Scatter) showing relative distances from Westwood base.
+                b. "Kid's Energy Forecast" (Chart.js Line) predicting fatigue levels based on activity intensity.
+         3. Utility Section: Packing Checklist & Safety Tips.
+         4. Rationale: Structure allows parents to visualize the flow of the day, understand logistics (distance), and manage the child's condition (energy), which are the user's main concerns. -->
+    <!-- Visualization & Content Choices:
+         1. Plotly Scatter Plot: To visualize the driving range and direction from the hotel without using heavy Maps APIs. Goal: Show proximity and safety.
+         2. Chart.js Line Chart: "Energy Forecast". Goal: Help parents plan rest times. Interaction: Updates per day.
+         3. Interactive Timeline: Text cards. Goal: Details. Interaction: Click to expand details.
+         4. Checklist: Interactive HTML. Goal: Preparation.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-[#fdfaf6] min-h-screen pb-12">
+
+    <!-- Header Section -->
+    <header class="bg-white card-shadow sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">LA 가족 여행 플래너 <span class="text-amber-500 text-lg font-normal ml-2">with 5세 아이</span></h1>
+                <p class="text-sm text-gray-500">Royal Palace Westwood Base | 4월 11일 - 14일</p>
+            </div>
+            <div class="hidden md:block text-right">
+                <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">렌터카 이동</span>
+                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">안전 지역 위주</span>
+                <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">아이 맞춤형</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- Introduction -->
+        <div class="lg:col-span-12 mb-4">
+            <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-amber-500">
+                <h2 class="text-xl font-bold mb-2">여행 개요 및 전략</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    이 대시보드는 5세 아이와 함께하는 3박 4일 LA 여행을 위해 최적화되었습니다. 
+                    <strong>Royal Palace Westwood</strong> 호텔을 베이스캠프로 하여, 치안이 우수한 Westside와 Mid-City 지역을 중심으로 동선을 짰습니다.
+                    혼잡한 명예의 거리를 피하고, 아이의 체력을 고려하여 <strong>'오전 활동 - 여유로운 점심 - 오후 랜드마크 - 빠른 귀가'</strong> 패턴을 유지합니다.
+                    아래 탭을 눌러 날짜별 세부 동선과 예상 체력 소모를 확인하세요.
+                </p>
+            </div>
+        </div>
+
+        <!-- Left Column: Navigation & Itinerary -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+            
+            <!-- Day Navigation -->
+            <div class="flex space-x-1 border-b border-gray-200">
+                <button onclick="switchDay(0)" id="tab-0" class="tab-active flex-1 py-4 px-1 text-center text-sm md:text-base transition-colors duration-200">
+                    Day 1<br><span class="text-xs font-normal">4/11 (토) - 예술과 바다</span>
+                </button>
+                <button onclick="switchDay(1)" id="tab-1" class="tab-inactive flex-1 py-4 px-1 text-center text-sm md:text-base transition-colors duration-200">
+                    Day 2<br><span class="text-xs font-normal">4/12 (일) - 공원과 랜드마크</span>
+                </button>
+                <button onclick="switchDay(2)" id="tab-2" class="tab-inactive flex-1 py-4 px-1 text-center text-sm md:text-base transition-colors duration-200">
+                    Day 3<br><span class="text-xs font-normal">4/13 (월) - 유니버셜 스튜디오</span>
+                </button>
+            </div>
+
+            <!-- Dynamic Itinerary Content -->
+            <div id="itinerary-container" class="space-y-4">
+                <!-- Content injected by JS -->
+            </div>
+
+            <!-- Smart Tips Section -->
+            <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                <h3 class="font-bold text-blue-900 mb-3 flex items-center">
+                    <span>💡 5세 아이와 함께하는 여행 꿀팁</span>
+                </h3>
+                <ul class="space-y-2 text-sm text-blue-800" id="daily-tips">
+                    <!-- Tips injected by JS -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Column: Visualizations & Analytics -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- Location Map Visualization -->
+            <div class="bg-white p-5 rounded-xl card-shadow">
+                <div class="mb-4">
+                    <h3 class="font-bold text-gray-800 text-lg">🗺️ 오늘의 이동 동선 (Relative Map)</h3>
+                    <p class="text-xs text-gray-500">호텔(중심) 기준 주요 방문지 위치 및 거리감</p>
+                </div>
+                <div id="map-plot" class="w-full h-[300px] bg-gray-50 rounded-lg"></div>
+            </div>
+
+            <!-- Kid's Energy Forecast Chart -->
+            <div class="bg-white p-5 rounded-xl card-shadow">
+                <div class="mb-4">
+                    <h3 class="font-bold text-gray-800 text-lg">🔋 아이 체력 예측 그래프</h3>
+                    <p class="text-xs text-gray-500">시간대별 예상 피로도 및 휴식 필요 구간</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="energyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Interactive Checklist -->
+            <div class="bg-white p-5 rounded-xl card-shadow">
+                <h3 class="font-bold text-gray-800 text-lg mb-4">🎒 오늘의 필수 준비물</h3>
+                <div id="checklist-container" class="space-y-2">
+                    <!-- Checklist injected by JS -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Safety & Driving Info (Bottom Full Width) -->
+        <div class="lg:col-span-12 mt-4">
+            <div class="bg-gray-800 text-white p-6 rounded-xl shadow-lg">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                    <h3 class="text-lg font-bold text-amber-400">🚗 LA 렌터카 운전 및 안전 수칙</h3>
+                    <button onclick="toggleSafetyDetails()" class="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded mt-2 md:mt-0 transition">상세 보기 / 접기</button>
+                </div>
+                <div id="safety-details" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-300">
+                    <div>
+                        <h4 class="font-bold text-white mb-2">운전 주의사항</h4>
+                        <ul class="list-disc list-inside space-y-1">
+                            <li><strong>HOV 레인 (카풀):</strong> 2인 이상 탑승 시 이용 가능. 다이아몬드 표시 확인.</li>
+                            <li><strong>STOP 사인:</strong> 3초간 완전히 정지 후 출발 (엄격 단속).</li>
+                            <li><strong>비보호 좌회전:</strong> 녹색 신호 시, 맞은편 직진 차량이 없을 때 좌회전 가능.</li>
+                            <li><strong>스쿨버스:</strong> 스쿨버스가 'STOP' 표시를 펴면 양방향 모두 정지해야 함.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-white mb-2">치안 & 주차</h4>
+                        <ul class="list-disc list-inside space-y-1">
+                            <li><strong>차량 내 물품:</strong> 절대로 차 안에 가방, 동전, 옷 등을 보이게 두지 마세요 (창문 파손 절도 주의).</li>
+                            <li><strong>주차:</strong> 길거리 주차 시 표지판(주차 가능 시간, 청소 시간) 필독. 가능한 유료 주차장 이용 권장.</li>
+                            <li><strong>피해야 할 곳:</strong> 밤늦은 시간의 다운타운 LA, 할리우드 대로 뒷골목.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center text-gray-400 text-sm py-8 mt-8 border-t border-gray-200">
+        <p>4월 14일은 귀국일입니다. 안전한 비행 되세요! ✈️</p>
+    </footer>
+
+    <script>
+        // --- Data Definitions ---
+
+        const dayData = [
+            {
+                // Day 1: Westside
+                title: "Day 1: 예술과 바다 (Westside)",
+                date: "4월 11일 (토)",
+                summary: "장시간 비행 후 여유로운 일정. 호텔 근처의 예술 공간과 탁 트인 바다로 힐링합니다.",
+                activities: [
+                    { time: "10:00", title: "게티 센터 (The Getty Center)", desc: "트램 탑승 & 센트럴 가든 피크닉. 아이들이 뛰어놀기 좋은 잔디밭과 LA 전경 감상.", type: "Walk", icon: "🏛️" },
+                    { time: "13:30", title: "소텔 재팬타운 (Sawtelle)", desc: "점심 식사 (우동, 돈까스 등). 맵지 않은 메뉴가 많고 거리가 깨끗해 아이와 함께하기 최적.", type: "Food", icon: "🍜" },
+                    { time: "15:30", title: "산타모니카 피어 (Santa Monica)", desc: "퍼시픽 파크의 관람차와 해변 산책. 모래놀이 짧게 즐기기.", type: "Play", icon: "🎡" },
+                    { time: "18:00", title: "저녁 식사 및 휴식", desc: "숙소 근처 웨스트우드 빌리지에서 간단한 장보기 후 호텔 휴식.", type: "Rest", icon: "🏨" }
+                ],
+                tips: [
+                    "게티 센터 트램은 아이들이 정말 좋아합니다. 유모차 대여도 가능해요.",
+                    "산타모니카 주차는 피어 바로 위보다 인근 쇼핑몰(Santa Monica Place)이 훨씬 쾌적합니다.",
+                    "해변 바람이 쌀쌀할 수 있으니 겉옷을 꼭 챙기세요."
+                ],
+                // Map Coordinates (Relative: Westwood is 0,0)
+                mapPoints: [
+                    { x: 0, y: 0, name: "호텔(Westwood)", color: "#10b981", size: 20 },
+                    { x: -0.5, y: 3, name: "게티 센터", color: "#3b82f6", size: 15 },
+                    { x: -1, y: -0.5, name: "소텔", color: "#f59e0b", size: 12 },
+                    { x: -4, y: -2, name: "산타모니카", color: "#ef4444", size: 15 }
+                ],
+                // Energy Forecast (0-100)
+                energyLabels: ["10:00", "12:00", "14:00", "16:00", "18:00", "20:00"],
+                energyData: [90, 70, 85, 60, 40, 20], // Dip after lunch, drain at beach
+                checklist: [
+                    "선글라스 및 선크림", "아이 바람막이 자켓", "모래놀이 후 닦을 수건/물티슈", "호텔 바우처 확인"
+                ]
+            },
+            {
+                // Day 2: Mid-City
+                title: "Day 2: 공원과 랜드마크 (Mid-City)",
+                date: "4월 12일 (일)",
+                summary: "복잡한 곳은 피하고, 아이가 흥미로워할 공룡 화석과 전차, 천문대를 방문합니다.",
+                activities: [
+                    { time: "10:00", title: "라브레아 타르 피트", desc: "도심 속 화석 발굴지. 공원(Hancock Park)에서 뛰어놀고 Urban Light 조형물 사진 촬영.", type: "Walk", icon: "🦕" },
+                    { time: "12:30", title: "더 그로브 & 파머스 마켓", desc: "무료 트롤리(2층 전차) 탑승. 분수쇼 구경 및 야외 점심 식사.", type: "Food", icon: "🚋" },
+                    { time: "16:00", title: "그리피스 천문대", desc: "할리우드 사인 조망 & 우주 전시. 일몰 감상.", type: "Walk", icon: "🔭" },
+                    { time: "19:00", title: "호텔 귀가", desc: "교통 체증을 피하기 위해 조금 서둘러 귀가 후 휴식.", type: "Rest", icon: "🚗" }
+                ],
+                tips: [
+                    "그리피스 천문대는 주말 주차가 매우 어렵습니다. 'Greek Theatre' 주차 후 셔틀 이용을 추천합니다.",
+                    "더 그로브의 트롤리 운행 시간을 미리 확인하고 줄을 서세요.",
+                    "라브레아 공원은 잔디밭이 넓어 아이가 마음껏 뛰어놀기 좋습니다."
+                ],
+                mapPoints: [
+                    { x: 0, y: 0, name: "호텔(Westwood)", color: "#10b981", size: 20 },
+                    { x: 4, y: 0, name: "라브레아", color: "#3b82f6", size: 15 },
+                    { x: 4.5, y: 0.5, name: "더 그로브", color: "#f59e0b", size: 15 },
+                    { x: 7, y: 5, name: "그리피스 천문대", color: "#ef4444", size: 15 }
+                ],
+                energyLabels: ["10:00", "12:00", "14:00", "16:00", "18:00", "20:00"],
+                energyData: [95, 80, 85, 60, 50, 30], // Steady day
+                checklist: [
+                    "편안한 운동화 (많이 걷습니다)", "휴대용 유모차", "아이 간식 및 물", "카메라/삼각대"
+                ]
+            },
+            {
+                // Day 3: Universal Studios
+                title: "Day 3: 유니버셜 스튜디오 할리우드",
+                date: "4월 13일 (월)",
+                summary: "하루 종일 테마파크 일정입니다. 5세 아이 눈높이에 맞춰 '슈퍼 닌텐도 월드'와 '미니언즈' 위주로 공략합니다.",
+                activities: [
+                    { time: "09:00", title: "입장 및 하부 로트(Lower Lot)", desc: "슈퍼 닌텐도 월드 먼저 방문 (인기 최고). 마리오 카트 탑승.", type: "Play", icon: "🍄" },
+                    { time: "12:00", title: "상부 로트(Upper Lot) 이동 & 점심", desc: "심슨 라이드 근처 혹은 해리포터 구역에서 점심.", type: "Food", icon: "🍔" },
+                    { time: "13:30", title: "스튜디오 투어 & 미니언즈", desc: "앉아서 관람하는 스튜디오 투어로 체력 안배 후 미니언즈 구역 즐기기.", type: "Play", icon: "🚌" },
+                    { time: "17:00", title: "워터월드 쇼 & 기념품", desc: "화려한 액션 쇼 관람 후 시티워크 구경 및 퇴장.", type: "Walk", icon: "🌊" }
+                ],
+                tips: [
+                    "익스프레스 티켓이 없다면 개장 시간에 맞춰 입장하세요.",
+                    "5세 아이에게 해리포터 놀이기구는 무서울 수 있습니다. '플라이트 오브 히포그리프' 정도가 적당합니다.",
+                    "스튜디오 투어는 약 1시간 소요되며 앉아서 쉴 수 있는 좋은 기회입니다."
+                ],
+                mapPoints: [
+                    { x: 0, y: 0, name: "호텔(Westwood)", color: "#10b981", size: 20 },
+                    { x: 5, y: 6, name: "유니버셜 스튜디오", color: "#8b5cf6", size: 25 }
+                ],
+                energyLabels: ["09:00", "11:00", "13:00", "15:00", "17:00", "19:00"],
+                energyData: [100, 90, 60, 50, 40, 10], // Fast drain
+                checklist: [
+                    "입장권 QR코드 캡처", "보조배터리", "여벌 옷 (워터월드 물튐 주의)", "간단한 간식"
+                ]
+            }
+        ];
+
+        let currentDayIndex = 0;
+        let energyChartInstance = null;
+
+        // --- Core Logic ---
+
+        // Fixed: Renamed from renderDay to switchDay to match HTML onclick events
+        function switchDay(index) {
+            currentDayIndex = index;
+            const data = dayData[index];
+
+            // 1. Update Tabs
+            [0, 1, 2].forEach(i => {
+                const btn = document.getElementById(`tab-${i}`);
+                if (i === index) {
+                    btn.className = "tab-active flex-1 py-4 px-1 text-center text-sm md:text-base transition-colors duration-200 bg-amber-50 rounded-t-lg";
+                } else {
+                    btn.className = "tab-inactive flex-1 py-4 px-1 text-center text-sm md:text-base transition-colors duration-200 hover:bg-gray-50";
+                }
+            });
+
+            // 2. Update Itinerary Cards
+            const container = document.getElementById('itinerary-container');
+            container.innerHTML = '';
+            data.activities.forEach(act => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-lg border border-gray-100 card-shadow flex gap-4 hover:border-amber-300 transition-all";
+                card.innerHTML = `
+                    <div class="flex flex-col items-center justify-center min-w-[60px]">
+                        <span class="text-2xl">${act.icon}</span>
+                        <span class="text-xs font-bold text-gray-500 mt-1">${act.time}</span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">${act.title}</h4>
+                        <p class="text-sm text-gray-600 mt-1">${act.desc}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // 3. Update Tips
+            const tipsContainer = document.getElementById('daily-tips');
+            tipsContainer.innerHTML = data.tips.map(tip => `<li class="flex items-start"><span class="mr-2">•</span>${tip}</li>`).join('');
+
+            // 4. Update Checklist
+            const checkContainer = document.getElementById('checklist-container');
+            checkContainer.innerHTML = data.checklist.map((item, i) => `
+                <div class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer" onclick="toggleCheck(this)">
+                    <div class="w-5 h-5 border-2 border-amber-400 rounded mr-3 flex items-center justify-center text-white check-box transition-colors">✓</div>
+                    <span class="text-sm text-gray-700 select-none">${item}</span>
+                </div>
+            `).join('');
+
+            // 5. Update Map (Plotly)
+            updateMap(data.mapPoints);
+
+            // 6. Update Energy Chart (Chart.js)
+            updateEnergyChart(data.energyLabels, data.energyData);
+        }
+
+        // --- Visualization Functions ---
+
+        function updateMap(points) {
+            const trace = {
+                x: points.map(p => p.x),
+                y: points.map(p => p.y),
+                text: points.map(p => p.name),
+                mode: 'markers+text',
+                type: 'scatter',
+                textposition: 'top center',
+                marker: {
+                    size: points.map(p => p.size),
+                    color: points.map(p => p.color),
+                    line: { width: 2, color: '#fff' }
+                },
+                hoverinfo: 'text'
+            };
+
+            const layout = {
+                margin: { t: 20, b: 20, l: 20, r: 20 },
+                xaxis: { showgrid: true, zeroline: false, showticklabels: false, range: [-6, 8] },
+                yaxis: { showgrid: true, zeroline: false, showticklabels: false, range: [-4, 8] },
+                dragmode: false,
+                paper_bgcolor: '#f9fafb',
+                plot_bgcolor: '#f9fafb',
+                showlegend: false
+            };
+
+            const config = { responsive: true, displayModeBar: false };
+            Plotly.newPlot('map-plot', [trace], layout, config);
+        }
+
+        function updateEnergyChart(labels, data) {
+            const ctx = document.getElementById('energyChart').getContext('2d');
+            
+            if (energyChartInstance) {
+                energyChartInstance.destroy();
+            }
+
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(245, 158, 11, 0.5)'); // Amber
+            gradient.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+
+            energyChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '아이 에너지 레벨',
+                        data: data,
+                        borderColor: '#f59e0b',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#d97706',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let val = context.raw;
+                                    if (val > 80) return `⚡ 에너지 뿜뿜! (${val}%)`;
+                                    if (val > 50) return `🙂 활동하기 좋아요 (${val}%)`;
+                                    if (val > 20) return `🥱 휴식이 필요해요 (${val}%)`;
+                                    return `😴 졸려요... (${val}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100,
+                            display: true,
+                            title: { display: true, text: '활력도 (%)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Utility Functions ---
+
+        function toggleCheck(el) {
+            const box = el.querySelector('.check-box');
+            const text = el.querySelector('span');
+            
+            if (box.classList.contains('bg-amber-500')) {
+                box.classList.remove('bg-amber-500');
+                text.classList.remove('line-through', 'text-gray-400');
+            } else {
+                box.classList.add('bg-amber-500');
+                text.classList.add('line-through', 'text-gray-400');
+            }
+        }
+
+        function toggleSafetyDetails() {
+            const details = document.getElementById('safety-details');
+            if (details.style.display === 'none') {
+                details.style.display = 'grid';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+
+        // Initialize
+        window.onload = () => {
+            switchDay(0); // Fixed: Changed from renderDay to switchDay
+            // Default show details for safety on large screens
+            if (window.innerWidth < 768) {
+                document.getElementById('safety-details').style.display = 'none';
+            }
+        };
+
+        // Resize handler for charts
+        window.addEventListener('resize', () => {
+            if(energyChartInstance) energyChartInstance.resize();
+            Plotly.Plots.resize('map-plot');
+        });
+
+    </script>
+</body>
+</html>
