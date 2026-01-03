@@ -250,31 +250,176 @@
                 <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">🚗 이동 경로 요약</h3>
                 <div class="space-y-4 relative">
                     <div class="absolute left-2.5 top-2 bottom-2 w-0.5 bg-gray-200"></div>
-                    
+
                     <div class="relative pl-8">
                         <div class="absolute left-0 top-1 w-5 h-5 bg-orange-500 rounded-full border-4 border-white z-10"></div>
                         <h5 class="font-bold text-sm">LAX 공항 ➔ 애너하임 (화)</h5>
-                        <p class="text-sm text-gray-600">오후 3시경 출발 예상. 퇴근 시간 전이라 비교적 원활 (약 45분)</p>
+                        <p class="text-sm text-gray-600">퇴근 시간 정체로 약 1시간 30분 소요 예상</p>
                     </div>
-                    
+
                     <div class="relative pl-8">
                         <div class="absolute left-0 top-1 w-5 h-5 bg-gray-300 rounded-full border-4 border-white z-10"></div>
                         <h5 class="font-bold text-sm">애너하임 ➔ 조슈아트리 (금)</h5>
-                        <p class="text-sm text-gray-600">오전 10시 출발 추천. (약 2시간)</p>
+                        <p class="text-sm text-gray-600">Desert Hills Outlets 경유 가능 (약 2시간)</p>
                     </div>
 
                     <div class="relative pl-8">
                         <div class="absolute left-0 top-1 w-5 h-5 bg-gray-300 rounded-full border-4 border-white z-10"></div>
                         <h5 class="font-bold text-sm">조슈아트리 ➔ 웨스트우드 (토)</h5>
-                        <p class="text-sm text-gray-600">주말 LA 진입 교통량 많음. (약 2시간 30분)</p>
+                        <p class="text-sm text-gray-600">주말 LA 진입 교통량 주의 (약 2.5~3시간)</p>
                     </div>
 
                     <div class="relative pl-8">
                         <div class="absolute left-0 top-1 w-5 h-5 bg-blue-500 rounded-full border-4 border-white z-10"></div>
                         <h5 class="font-bold text-sm">웨스트우드 ➔ 유니버셜 (월)</h5>
-                        <p class="text-sm text-gray-600">약 20~30분 거리. 매우 가까움.</p>
+                        <p class="text-sm text-gray-600">출근 정체 반대방향이라 수월 (약 30~40분)</p>
+                    </div>
+
+                    <div class="relative pl-8">
+                        <div class="absolute left-0 top-1 w-5 h-5 bg-red-500 rounded-full border-4 border-white z-10"></div>
+                        <h5 class="font-bold text-sm">웨스트우드 ➔ LAX 공항 (화) ⚠️</h5>
+                        <p class="text-sm text-red-600 font-medium">I-405 S 최악 정체! 평소 20분 → 1시간+. 8시 출발 필수!</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- Westwood Area Guide -->
+            <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">🏘️ 웨스트우드 주변 가이드</h3>
+
+                <!-- Safety Info -->
+                <div class="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                    <h4 class="font-bold text-green-800 text-sm mb-2"><i class="fas fa-shield-alt mr-1"></i> 치안 정보</h4>
+                    <ul class="text-xs text-green-700 space-y-1">
+                        <li>• UCLA 캠퍼스 인접 - LAPD + UCPD 이중 순찰로 LA에서 가장 안전한 지역 중 하나</li>
+                        <li>• 폭력 범죄율 국가 평균 대비 67% 낮음</li>
+                        <li>• UCLA Mattel Children's Hospital 도보 5~10분 (24시간 소아 응급실)</li>
+                    </ul>
+                </div>
+
+                <!-- Nearby Stores -->
+                <div class="mb-4">
+                    <h4 class="font-bold text-gray-700 text-sm mb-2"><i class="fas fa-shopping-basket mr-1"></i> 도보 5분 내 마트</h4>
+                    <div class="grid grid-cols-3 gap-2 text-xs">
+                        <div class="bg-red-50 p-2 rounded text-center">
+                            <span class="font-bold text-red-600">Target</span><br>
+                            <span class="text-gray-500">식료품, 아동복</span>
+                        </div>
+                        <div class="bg-orange-50 p-2 rounded text-center">
+                            <span class="font-bold text-orange-600">Trader Joe's</span><br>
+                            <span class="text-gray-500">아이 간식 최고</span>
+                        </div>
+                        <div class="bg-blue-50 p-2 rounded text-center">
+                            <span class="font-bold text-blue-600">Ralphs</span><br>
+                            <span class="text-gray-500">대형 마트</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kid-Friendly Spots -->
+                <div class="mb-4">
+                    <h4 class="font-bold text-gray-700 text-sm mb-2"><i class="fas fa-child mr-1"></i> 아이와 가기 좋은 곳</h4>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex items-start">
+                            <span class="bg-purple-100 text-purple-600 px-2 py-0.5 rounded mr-2 font-bold">놀이터</span>
+                            <div>
+                                <span class="font-bold">Aidan's Place</span> - 포용적 놀이터, 충격흡수 바닥, 안전 펜스, 모래놀이 공간
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-green-100 text-green-600 px-2 py-0.5 rounded mr-2 font-bold">식물원</span>
+                            <div>
+                                <span class="font-bold">UCLA Botanical Garden</span> - 무료 입장! 거북이/잉어 찾기 놀이
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-pink-100 text-pink-600 px-2 py-0.5 rounded mr-2 font-bold">미술관</span>
+                            <div>
+                                <span class="font-bold">Hammer Museum</span> - 무료, 팽이 의자(Spun Chairs) 아이들 인기!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Restaurants -->
+                <div>
+                    <h4 class="font-bold text-gray-700 text-sm mb-2"><i class="fas fa-utensils mr-1"></i> 추천 식당 (키즈 메뉴)</h4>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                            <div>
+                                <span class="font-bold">Granville</span>
+                                <span class="text-gray-500 ml-1">- Kid's Mac & Cheese, 버터 파스타</span>
+                            </div>
+                            <span class="text-orange-500">$$</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                            <div>
+                                <span class="font-bold">Maria's Italian Kitchen</span>
+                                <span class="text-gray-500 ml-1">- 피자 $8, 스파게티 $9</span>
+                            </div>
+                            <span class="text-orange-500">$$</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                            <div>
+                                <span class="font-bold">In-N-Out Burger</span>
+                                <span class="text-gray-500 ml-1">- LA 필수! Plain Burger 주문 가능</span>
+                            </div>
+                            <span class="text-green-500">$</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                            <div>
+                                <span class="font-bold">Diddy Riese</span>
+                                <span class="text-gray-500 ml-1">- 저렴한 쿠키 아이스크림 샌드위치!</span>
+                            </div>
+                            <span class="text-green-500">$</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hotel Tips -->
+            <div class="bg-yellow-50 rounded-xl shadow-sm p-5 border border-yellow-200">
+                <h3 class="text-lg font-bold text-yellow-800 mb-3"><i class="fas fa-lightbulb mr-1"></i> Royal Palace Westwood 숙박 팁</h3>
+                <ul class="text-sm text-yellow-700 space-y-2">
+                    <li><i class="fas fa-check-circle text-yellow-600 mr-2"></i><strong>무료 주차</strong> - LA에서 $30+/일 절약! 렌터카 여행객에게 큰 장점</li>
+                    <li><i class="fas fa-check-circle text-yellow-600 mr-2"></i><strong>전자레인지 & 냉장고</strong> - 아이 음식 보관/데우기 가능. Trader Joe's에서 장보기!</li>
+                    <li><i class="fas fa-check-circle text-yellow-600 mr-2"></i><strong>퀸베드 2개</strong> - 가족 여행에 최적. 롤러웨이 베드 추가 불필요</li>
+                    <li><i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i><strong>소음 대책</strong> - 최상층(Top Floor) & 도로 반대편 방 요청. 백색 소음기 앱 준비!</li>
+                    <li><i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i><strong>앰뷸런스 소음</strong> - UCLA 병원 인접. 간헐적 사이렌 소리 가능</li>
+                </ul>
+            </div>
+
+            <!-- Weather Info -->
+            <div class="bg-blue-50 rounded-xl shadow-sm p-5 border border-blue-200">
+                <h3 class="text-lg font-bold text-blue-800 mb-3"><i class="fas fa-cloud-sun mr-1"></i> 4월 날씨 & 의류</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                    <div class="bg-white p-3 rounded-lg">
+                        <h4 class="font-bold text-gray-700">애너하임/LA</h4>
+                        <p class="text-gray-600">12°C ~ 22°C</p>
+                        <p class="text-xs text-gray-500 mt-1">일교차 큼. 겉옷 필수</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg">
+                        <h4 class="font-bold text-gray-700">조슈아트리</h4>
+                        <p class="text-gray-600">낮 25°C+ / 밤 10°C↓</p>
+                        <p class="text-xs text-red-500 mt-1">아동 방풍재킷 필수!</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg">
+                        <h4 class="font-bold text-gray-700">산타모니카</h4>
+                        <p class="text-gray-600">바닷바람 쌀쌀</p>
+                        <p class="text-xs text-gray-500 mt-1">해변 겉옷 챙기기</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spring Break Warning -->
+            <div class="bg-red-50 rounded-xl shadow-sm p-5 border border-red-200">
+                <h3 class="text-lg font-bold text-red-800 mb-3"><i class="fas fa-exclamation-circle mr-1"></i> 스프링 브레이크 주의!</h3>
+                <p class="text-sm text-red-700 mb-2">4월 7~14일은 부활절(4/5) 직후 봄방학 시즌으로 <strong>성수기(Peak)</strong> 요금 적용!</p>
+                <ul class="text-sm text-red-600 space-y-1">
+                    <li>• 인기 어트랙션 대기시간 <strong>60~120분</strong> 예상</li>
+                    <li>• <strong>오픈런(Rope Drop)</strong>이 핵심 전략 - 개장 시간에 맞춰 입장</li>
+                    <li>• <strong>Lightning Lane / Express Pass</strong> 구매 강력 권장</li>
+                </ul>
             </div>
 
         </section>
@@ -306,56 +451,83 @@
             ],
             schedule: {
                 'd1': [
-                    { time: '14:50', title: 'LAX 공항 도착', icon: 'fa-plane-arrival', desc: '입국 수속(1시간 소요 예상). 렌터카 셔틀 탑승.' },
-                    { time: '16:30', title: '렌터카 픽업', icon: 'fa-car', desc: '카시트 장착 확인. 애너하임으로 이동 (약 45분~1시간).' },
-                    { time: '18:00', title: '체크인 & 저녁', icon: 'fa-hotel', desc: 'Alpine Inn 체크인. 인근 IHOP이나 Denny\'s에서 저녁 식사.' },
-                    { time: '19:30', title: '월그린/타겟 쇼핑', icon: 'fa-shopping-basket', desc: '물, 간식, 다음날 아침거리 구매.' }
+                    { time: '14:50', title: 'LAX 공항 도착', icon: 'fa-plane-arrival', desc: '입국 수속(1시간 소요 예상). 렌터카 셔틀로 이동. 미니밴(Chrysler Pacifica 등) 추천.' },
+                    { time: '17:00', title: '렌터카 픽업 & 이동', icon: 'fa-car', desc: '카시트 장착 확인 필수(CA주법 8세 미만 필수). 퇴근 시간 정체로 애너하임까지 약 1시간 30분.' },
+                    { time: '18:30', title: 'Hotel Alpine Inn 체크인', icon: 'fa-hotel', desc: '짐을 풀고 잠시 휴식. 디즈니랜드 도보 이동 가능한 위치.' },
+                    { time: '19:00', title: 'Downtown Disney 저녁', icon: 'fa-utensils', desc: '입장료 없이 디즈니 분위기 만끽! Naples Ristorante e Bar(피자) 추천. 기념품샵 구경.' }
                 ],
                 'd2': [
-                    { time: '08:00', title: '디즈니랜드 파크', icon: 'fa-fort-awesome', desc: '오픈런 권장. 5세 아이 추천: 잇츠 어 스몰 월드, 덤보, 피터팬.' },
-                    { time: '14:00', title: '호텔 휴식 (선택)', icon: 'fa-bed', desc: '호텔이 가까우므로 낮잠 후 재입장 추천.' },
-                    { time: '21:30', title: '불꽃놀이', icon: 'fa-magic', desc: '메인 스트리트나 성 앞 점령.' }
+                    { time: '08:00', title: '디즈니랜드 Rope Drop!', icon: 'fa-fort-awesome', desc: '개장과 동시에 Peter Pan\'s Flight 직행(대기 가장 김). 이후 Dumbo, It\'s a Small World.' },
+                    { time: '11:00', title: 'Toontown 탐험', icon: 'fa-child', desc: 'Mickey & Minnie\'s Runaway Railway 탑승. 아이들이 뛰어놀 수 있는 공원에서 휴식.' },
+                    { time: '14:00', title: '호텔 복귀 & 낮잠', icon: 'fa-bed', desc: '5세 아동 체력 관리 핵심! 호텔 수영장에서 쉬거나 낮잠. 재입장 손도장 필수.' },
+                    { time: '17:00', title: '재입장 & 저녁', icon: 'fa-moon', desc: 'Fantasyland 추가 탐험. 저녁 퍼레이드 명당 확보.' },
+                    { time: '21:30', title: '불꽃놀이 관람', icon: 'fa-magic', desc: '메인 스트리트나 성 앞에서 마법의 순간! Lightning Lane 구매 시 대기시간 대폭 절감.' }
                 ],
                 'd3': [
-                    { time: '08:00', title: '캘리포니아 어드벤처', icon: 'fa-ticket-alt', desc: '카 랜드(Cars Land)가 하이라이트. 라이트닝 맥퀸과 사진 찍기.' },
-                    { time: '12:00', title: '점심 식사', icon: 'fa-utensils', desc: 'Pym Test Kitchen 등 테마 식당 이용.' },
-                    { time: '21:00', title: 'World of Color', icon: 'fa-water', desc: '분수쇼 관람 (오전 중 앱으로 가상 대기열 등록 필수).' }
+                    { time: '08:00', title: 'California Adventure 오픈런', icon: 'fa-ticket-alt', desc: 'Cars Land 직행! Radiator Springs Racers는 5세(키 102cm↑) 탑승 가능한 최고 어트랙션.' },
+                    { time: '11:00', title: 'Pixar Pier & Avengers', icon: 'fa-spider', desc: 'Toy Story Midway Mania, Web Slingers(스파이더맨) 체험. 라이트닝 맥퀸과 사진!' },
+                    { time: '12:30', title: '점심 식사', icon: 'fa-utensils', desc: 'Pym Test Kitchen에서 재미있는 사이즈의 음식들. 거대 프레첼 인기!' },
+                    { time: '14:00', title: '호텔 휴식', icon: 'fa-bed', desc: '오후 더위 피하기. 낮잠 또는 수영장 이용.' },
+                    { time: '20:00', title: 'World of Color 분수쇼', icon: 'fa-water', desc: '오전 중 앱으로 가상 대기열(Virtual Queue) 등록 필수! 감동적인 피날레.' }
                 ],
                 'd4': [
-                    { time: '10:00', title: '조슈아트리로 이동', icon: 'fa-road', desc: '체크아웃 후 출발 (약 2시간 소요). 데저트 힐스 아울렛 경유 가능.' },
-                    { time: '13:00', title: '점심 & 공원 입장', icon: 'fa-tree', desc: '입구 비지터 센터 방문. 스컬 록(Skull Rock) 구경.' },
-                    { time: '16:00', title: '숙소 체크인', icon: 'fa-home', desc: '에어비앤비 혹은 호텔 체크인. 바베큐 파티 준비.' },
-                    { time: '20:00', title: '별 관측', icon: 'fa-star', desc: '쏟아지는 별 구경.' }
+                    { time: '09:30', title: '체크아웃 & 이동', icon: 'fa-road', desc: '애너하임 → 조슈아트리 (약 2시간). 여유있게 출발.' },
+                    { time: '12:00', title: 'Desert Hills Premium Outlets', icon: 'fa-shopping-bag', desc: '이동 중 경유. 나이키, 폴로 등 아동복 저렴! 점심 식사.' },
+                    { time: '15:00', title: '숙소 체크인 (Yucca Valley)', icon: 'fa-home', desc: '독채 에어비앤비 추천. 마당에서 아이가 뛰어놀기 좋음. Hot Tub/Fire Pit 있으면 최고!' },
+                    { time: '16:30', title: 'Pioneertown 탐험', icon: 'fa-hat-cowboy', desc: '1940년대 서부 영화 세트장 마을. 차 없는 흙길에서 안전하게 구경. Pappy & Harriet\'s 바베큐 추천.' },
+                    { time: '20:00', title: '별 관측', icon: 'fa-star', desc: '숙소 마당에서도 쏟아지는 별! 사막 밤 기온 10°C 이하, 방풍 재킷 필수.' }
                 ],
                 'd5': [
-                    { time: '10:00', title: 'LA로 이동', icon: 'fa-car-side', desc: '웨스트우드(Royal Palace Westwood)로 이동. 주말이라 교통량 많음 주의.' },
-                    { time: '13:00', title: '게티 센터', icon: 'fa-landmark', desc: '아이들이 뛰어놀기 좋은 정원. 트램 탑승. (입장료 무료, 주차비 유료)' },
-                    { time: '18:00', title: '체크인 & UCLA 산책', icon: 'fa-university', desc: '호텔 체크인 후 안전한 대학가 주변 산책 및 저녁.' }
+                    { time: '09:00', title: '조슈아트리 국립공원', icon: 'fa-tree', desc: 'Hidden Valley Trail(1마일, 평탄) - 아이들이 바위 틈 탐험하기 좋음.' },
+                    { time: '10:30', title: 'Skull Rock & Keys View', icon: 'fa-mountain', desc: '해골 바위 앞 사진 촬영. Keys View에서 차로 올라가 전경 감상.' },
+                    { time: '12:00', title: 'LA로 이동', icon: 'fa-car-side', desc: '점심 후 웨스트우드로 출발. 주말 LA 진입 교통량 주의 (약 2.5~3시간).' },
+                    { time: '16:00', title: 'Royal Palace Westwood 체크인', icon: 'fa-hotel', desc: '무료 주차! 전자레인지/냉장고 완비. 최상층 요청(소음 차단). UCLA 인접 안전 지역.' },
+                    { time: '17:30', title: 'Trader Joe\'s 장보기', icon: 'fa-shopping-basket', desc: '도보 5분. 아이 간식(치즈스틱, 요거트, 과일), 우유, 햇반 구매.' },
+                    { time: '19:00', title: '산타모니카 피어 (선택)', icon: 'fa-umbrella-beach', desc: '체력 되면 Pacific Park 관람차. 또는 호텔 근처에서 휴식.' }
                 ],
                 'd6': [
-                    { time: '10:00', title: '산타모니카 피어', icon: 'fa-umbrella-beach', desc: '바닷가 모래놀이. 퍼시픽 파크 관람차 탑승.' },
-                    { time: '15:00', title: '그로브 몰 / 파머스 마켓', icon: 'fa-shopping-bag', desc: '아이쇼핑 및 트롤리 탑승. 저녁 식사 해결.' },
-                    { time: '19:00', title: '휴식', icon: 'fa-moon', desc: '다음날 유니버셜 스튜디오를 위해 체력 비축.' }
+                    { time: '09:00', title: 'UCLA 식물원 산책', icon: 'fa-leaf', desc: 'Mildred E. Mathias Botanical Garden. 무료 입장! 거북이와 잉어 찾기 놀이.' },
+                    { time: '10:00', title: '게티 센터', icon: 'fa-landmark', desc: '트램 타고 올라가기! 정원에서 아이가 뛰어놀기 좋음. (입장 무료, 주차 $25, 사전예약 필수)' },
+                    { time: '13:00', title: '점심 & 휴식', icon: 'fa-utensils', desc: 'Granville 또는 Maria\'s Italian Kitchen에서 키즈메뉴. 호텔 낮잠.' },
+                    { time: '15:30', title: 'Aidan\'s Place 놀이터', icon: 'fa-child', desc: 'Westwood Rec Center 내 포용적 놀이터. 충격흡수 바닥, 안전 펜스. 모래놀이 세트 챙기기!' },
+                    { time: '17:00', title: '그리피스 천문대', icon: 'fa-binoculars', desc: '월요일 휴관이므로 일요일 필수 방문! 할리우드 사인 조망. 주말 저녁 주차난 심함 - 일찍 도착 권장.' },
+                    { time: '19:00', title: 'In-N-Out Burger 저녁', icon: 'fa-hamburger', desc: 'LA 필수 코스! 아이에겐 Plain Burger 주문. 시끄러워서 아이 울어도 OK.' }
                 ],
                 'd7': [
-                    { time: '09:00', title: '유니버셜 스튜디오', icon: 'fa-film', desc: '월요일이라 주말보다 쾌적. 닌텐도 월드 직행. 스튜디오 투어 버스 탑승.' },
-                    { time: '13:00', title: '심슨 라이드 등', icon: 'fa-smile', desc: '아이가 탈 수 있는 놀이기구 위주 공략 (키 제한 확인).' },
-                    { time: '18:00', title: '시티 워크', icon: 'fa-hamburger', desc: '부바 검프 등에서 마지막 저녁 식사.' }
+                    { time: '08:00', title: '유니버셜 스튜디오 출발', icon: 'fa-car', desc: '웨스트우드에서 30~40분. 출근 정체 반대 방향이라 수월. 주차비 약 $30.' },
+                    { time: '09:00', title: 'Super Nintendo World 직행!', icon: 'fa-gamepad', desc: '입장 즉시 Lower Lot으로! Mario Kart: Bowser\'s Challenge 5세 탑승 가능(보호자 동반). Power-Up Band($40) 구매하면 인터랙티브 체험!' },
+                    { time: '11:00', title: 'Toadstool Cafe 점심', icon: 'fa-utensils', desc: '당일 오전 QR코드로 미리 예약 필수! 마리오 테마 귀여운 음식들.' },
+                    { time: '12:30', title: 'Upper Lot 탐험', icon: 'fa-film', desc: 'Minion Land: Despicable Me 라이드 + Super Silly Fun Land(물놀이). 여벌옷 준비!' },
+                    { time: '14:00', title: 'Studio Tour', icon: 'fa-bus', desc: '트램 타고 1시간 영화 세트장 투어. 다리 쉬기 좋음! 킹콩/분노의질주 구간은 소리 커서 미리 설명.' },
+                    { time: '15:30', title: 'The Secret Life of Pets', icon: 'fa-dog', desc: '강아지 로봇 라이드. 아이들이 정말 좋아함! DreamWorks Theatre 쿵푸팬더 4D도.' },
+                    { time: '18:00', title: 'CityWalk 저녁 & 퇴장', icon: 'fa-hamburger', desc: '유니버셜 시티워크에서 마지막 저녁. 기념품 쇼핑 후 호텔 복귀.' }
                 ],
                 'd8': [
-                    { time: '09:00', title: '공항으로 이동', icon: 'fa-suitcase', desc: '웨스트우드에서 공항 가깝지만(30분), 렌터카 반납 시간 고려하여 여유있게 출발.' },
-                    { time: '10:00', title: '렌터카 반납', icon: 'fa-undo', desc: '차량 반납 후 셔틀로 공항 터미널 이동.' },
-                    { time: '12:30', title: '인천행 출발', icon: 'fa-plane-departure', desc: '즐거운 추억을 안고 귀국. (한국 도착 4/15 17:50)' }
+                    { time: '08:00', title: '호텔 출발 (중요!)', icon: 'fa-exclamation-triangle', desc: '⚠️ I-405 S는 LA 최악의 정체 구간! 평소 20분이 1시간+ 걸림. 늦어도 8:15 출발!' },
+                    { time: '09:00', title: '렌터카 반납', icon: 'fa-undo', desc: 'LAX 렌터카 센터 도착. 주유 상태 확인. 반납 후 셔틀로 터미널 이동.' },
+                    { time: '09:30', title: '공항 도착 & 체크인', icon: 'fa-suitcase', desc: '12:30 비행기이므로 최소 3시간 전 도착 목표. 면세점 쇼핑 시간 확보.' },
+                    { time: '12:30', title: '인천행 출발', icon: 'fa-plane-departure', desc: '즐거운 추억을 안고 귀국! 4/15(수) 17:50 인천 도착 예정.' }
                 ]
             },
             checklist: [
-                { category: '필수 서류', items: ['여권 (유효기간 6개월 이상)', 'ESTA 승인서 출력', '항공권 E-Ticket', '호텔/렌터카 바우처', '국제면허증 & 한국면허증'] },
-                { category: '5세 아이 용품', items: ['휴대용 유모차 (필수)', '비상약 (해열제/체온계)', '선글라스/모자/선크림', '긴팔 외투 (사막/밤 추위 대비)', '차량용 햇빛 가리개'] },
-                { category: '기타 준비물', items: ['미국 유심/로밍', '돼지코(110v 어댑터)', '보조 배터리', '디즈니/유니버셜 앱 다운로드', '우버 앱 카드등록'] }
+                { category: '필수 서류', items: ['여권 (유효기간 6개월 이상)', 'ESTA 승인서 출력본', '항공권 E-Ticket', '호텔/렌터카 바우처 출력', '국제면허증 & 한국면허증', '여행자 보험 증서'] },
+                { category: '5세 아이 용품', items: ['휴대용 유모차 (필수!)', '휴대용 부스터 카시트 또는 현지 구매($30~40)', '비상약 (해열제/타이레놀/체온계)', '선글라스/모자/선크림 SPF50+', '아동용 방풍 재킷 (사막 강풍/밤추위)', '여벌 옷 2세트 (물놀이 대비)', '백색 소음기 앱 또는 기기'] },
+                { category: '테마파크 준비', items: ['디즈니랜드 앱 설치 (Lightning Lane)', '유니버셜 앱 설치', '게티 센터 사전 예약', '휴대용 선풍기/쿨타월', '간식 (그래놀라바, 젤리 등)', '모래놀이 세트 (놀이터용)'] },
+                { category: '기타 준비물', items: ['미국 유심/로밍', '돼지코 어댑터 (110V)', '보조 배터리 20000mAh+', '우버/리프트 앱 카드등록', '귀마개 (호텔 소음 대비)'] }
             ],
             costs: {
-                base: { tickets: 1300000, accom: 1600000, transport: 700000, food: 900000, misc: 400000 }, 
-                options: { genie: 160000, express: 450000 }
+                // 환율 1 USD = 1,400 KRW 기준 (PDF 기준)
+                base: {
+                    tickets: 2380000,  // 디즈니 2일권 $985 + 유니버셜 $450 = $1,700 × 1,400
+                    accom: 2240000,    // 총 7박 $1,600 × 1,400
+                    transport: 1050000, // 렌터카+주유+주차 $750 × 1,400
+                    food: 1820000,     // 1일 3식+간식 $1,300 × 1,400
+                    misc: 560000       // 쇼핑/기념품 $400 × 1,400
+                },
+                options: {
+                    genie: 294000,     // Lightning Lane $35 × 3인 × 2일 = $210 × 1,400
+                    express: 420000    // Express Pass $100 × 3인 = $300 × 1,400
+                }
             }
         };
 
