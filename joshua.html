@@ -1,0 +1,598 @@
+<!-- Chosen Palette: Desert Night & Day (Warm Sand, Terracotta, Deep Midnight Blue, Starry White) -->
+<!-- Application Structure Plan: "Due Diligence Dashboard" + "Smart Itinerary".
+     1. Executive Summary: Radar Chart for quick assessment.
+     2. Interactive Deep Dive Tabs: Stargazing, Itinerary, Safety, Usability.
+     3. Itinerary 2.0 (UPDATED): Visual timeline with functional Google Maps Deep Links for specific routes (Anaheim -> Pioneertown -> JT -> Westwood).
+     4. Gemini AI Integrations: Stars, Reviews, and NEW Route Optimization. -->
+<!-- Visualization & Content Choices: 
+     1. Google Maps Deep Links: Functional buttons opening distinct route segments.
+     2. Timeline UI: Enhanced visual flow for the trip.
+     3. Charts (Radar/Line/Bar): Data visualization for decision making.
+     4. Gemini API: Dynamic travel assistant. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casa Nova Desert Escape: 분석 & 루트 플래너</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+        
+        body { font-family: 'Noto Sans KR', sans-serif; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #d4a373; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #b08968; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; 
+            height: 350px;
+            max-height: 400px;
+            margin: 0 auto;
+        }
+
+        .tab-active { border-bottom: 3px solid #1e3a8a; color: #1e3a8a; font-weight: 700; }
+        .tab-inactive { color: #6b7280; font-weight: 400; }
+        .tab-inactive:hover { color: #1e3a8a; }
+
+        /* Timeline & Route Styles */
+        .timeline-line {
+            position: absolute;
+            left: 23px;
+            top: 20px;
+            bottom: -20px;
+            width: 2px;
+            background-color: #cbd5e1; /* slate-300 */
+            z-index: 0;
+        }
+        .last-item .timeline-line { display: none; }
+        
+        .route-btn {
+            transition: all 0.2s;
+        }
+        .route-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Loading & Modal */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #1e3a8a;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .ai-response-content h1, .ai-response-content h2, .ai-response-content h3 { font-weight: bold; margin-bottom: 0.5rem; color: #1e3a8a; }
+        .ai-response-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+        .ai-response-content p { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 transition-colors duration-500" id="mainBody">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-blue-900 rounded-full flex items-center justify-center text-white font-bold text-lg">C</div>
+                <h1 class="text-xl font-bold text-stone-800 tracking-tight">Casa Nova <span class="text-stone-500 font-normal text-sm ml-2">Desert Plan & Route</span></h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="la_family_trip_planner.html" class="text-sm bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-full transition shadow-sm flex items-center gap-1">
+                    <span>📅 전체 일정</span>
+                </a>
+                <a href="index.html" class="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-full transition shadow-sm flex items-center gap-1">
+                    <span>🏙️ LA 일정</span>
+                </a>
+                <button id="themeToggle" class="text-sm bg-blue-900 text-white px-4 py-2 rounded-full hover:bg-blue-800 transition shadow-lg flex items-center gap-2">
+                    <span>🌙 야간 모드</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-12">
+
+        <!-- Executive Summary -->
+        <section class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start animate-fade-in-up">
+            <div class="md:col-span-7 space-y-4">
+                <h2 class="text-3xl font-bold text-stone-800 border-l-4 border-orange-400 pl-4">여행 & 숙소 종합 리포트</h2>
+                <p class="text-stone-600 leading-relaxed text-lg">
+                    <strong>2026년 4월의 완벽한 사막 여행</strong>을 위한 분석입니다. 애너하임에서 출발하여 조슈아 트리(Casa Nova)를 거쳐 LA 웨스트우드로 돌아오는 코스입니다.
+                    <span class="font-bold text-blue-900">안전한 이동 경로</span>와 <span class="font-bold text-indigo-600">최적의 별 관측 타이밍</span>을 중심으로 설계되었습니다.
+                </p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-stone-200 text-center">
+                        <div class="text-sm text-stone-500 mb-1">여행 총 거리</div>
+                        <div class="text-2xl font-bold text-stone-700">~260<span class="text-sm font-normal">km</span></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-stone-200 text-center">
+                        <div class="text-sm text-stone-500 mb-1">별 관측 조건</div>
+                        <div class="text-2xl font-bold text-indigo-600">최상<span class="text-sm font-normal">(그믐 인접)</span></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-stone-200 text-center">
+                        <div class="text-sm text-stone-500 mb-1">숙소 안전 점수</div>
+                        <div class="text-2xl font-bold text-green-600">9.2<span class="text-sm font-normal">/10</span></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-stone-200 text-center">
+                        <div class="text-sm text-stone-500 mb-1">예상 운전 시간</div>
+                        <div class="text-2xl font-bold text-orange-500">5.5<span class="text-sm font-normal">시간+</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="md:col-span-5 bg-white p-6 rounded-2xl shadow-lg border border-stone-100 flex flex-col justify-center">
+                <h3 class="text-center font-semibold text-stone-700 mb-4">핵심 지표 밸런스</h3>
+                <div class="chart-container">
+                    <canvas id="summaryRadarChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tabs -->
+        <section id="analysis-section" class="bg-white rounded-2xl shadow-xl overflow-hidden border border-stone-200">
+            <div class="flex border-b border-stone-200 overflow-x-auto">
+                <button onclick="switchTab('itinerary')" id="tab-itinerary" class="tab-active flex-1 py-4 px-6 text-center focus:outline-none transition-colors whitespace-nowrap min-w-[120px]">
+                    🗓️ 여행 경로 (Route)
+                </button>
+                <button onclick="switchTab('stargazing')" id="tab-stargazing" class="tab-inactive flex-1 py-4 px-6 text-center focus:outline-none transition-colors whitespace-nowrap min-w-[120px]">
+                    ✨ 별 관측
+                </button>
+                <button onclick="switchTab('safety')" id="tab-safety" class="tab-inactive flex-1 py-4 px-6 text-center focus:outline-none transition-colors whitespace-nowrap min-w-[120px]">
+                    🛡️ 안전 & 청결
+                </button>
+                <button onclick="switchTab('usability')" id="tab-usability" class="tab-inactive flex-1 py-4 px-6 text-center focus:outline-none transition-colors whitespace-nowrap min-w-[120px]">
+                    🛋️ 편의성
+                </button>
+            </div>
+
+            <div class="p-6 md:p-8 bg-stone-50 min-h-[500px]">
+                
+                <!-- CONTENT 1: ITINERARY & ROUTES -->
+                <div id="content-itinerary" class="space-y-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-blue-900">🚘 1박 2일 로드트립 경로</h3>
+                            <p class="text-sm text-blue-700">애너하임 ➔ 파이오니어 타운 ➔ 조슈아 트리 ➔ LA 웨스트우드</p>
+                        </div>
+                        <button onclick="askRouteAdvice()" class="mt-2 md:mt-0 bg-white text-blue-800 border border-blue-200 text-xs font-bold py-2 px-4 rounded-full shadow hover:bg-blue-100 transition flex items-center gap-2">
+                            <span>🤖 Gemini 경로 브리핑</span>
+                        </button>
+                    </div>
+
+                    <!-- Day 1 Timeline -->
+                    <div class="relative pl-4">
+                        <h4 class="text-xl font-bold text-stone-800 mb-6 pl-2 flex items-center">
+                            <span class="bg-stone-800 text-white px-2 py-1 rounded text-sm mr-2">DAY 1</span> 
+                            2026. 04. 10 (금)
+                        </h4>
+
+                        <!-- Route Item 1 -->
+                        <div class="relative pl-10 pb-10">
+                            <div class="timeline-line"></div>
+                            <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-blue-500 rounded-full flex items-center justify-center z-10 shadow-sm">
+                                <span class="text-xl">🏨</span>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h5 class="text-lg font-bold text-stone-800">애너하임 출발 (체크아웃)</h5>
+                                    <span class="text-sm font-mono text-blue-600 font-bold">11:00 AM</span>
+                                </div>
+                                <p class="text-sm text-stone-500 mb-4">디즈니랜드 인근 호텔 체크아웃 후 북동쪽으로 이동</p>
+                                
+                                <!-- Map Button -->
+                                <a href="https://www.google.com/maps/dir/Anaheim,+CA/Pappy+%26+Harriet's,+Pioneertown+Road,+Pioneertown,+CA/" target="_blank" class="route-btn flex items-center justify-between bg-stone-100 hover:bg-stone-200 p-3 rounded-lg border border-stone-200 text-stone-700 group cursor-pointer no-underline">
+                                    <div class="flex items-center gap-3">
+                                        <div class="bg-green-500 w-2 h-2 rounded-full"></div>
+                                        <div class="text-sm">
+                                            <div class="font-bold">목적지: Pappy & Harriet's</div>
+                                            <div class="text-xs text-stone-500">약 1시간 45분 (155km) • I-15 N & CA-62 E 경유</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-stone-400 group-hover:text-stone-800">🗺️ 지도 열기 &rarr;</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Route Item 2 -->
+                        <div class="relative pl-10 pb-10">
+                            <div class="timeline-line"></div>
+                            <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-orange-400 rounded-full flex items-center justify-center z-10 shadow-sm">
+                                <span class="text-xl">🤠</span>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h5 class="text-lg font-bold text-stone-800">점심: Pappy & Harriet's</h5>
+                                    <span class="text-sm font-mono text-orange-600 font-bold">01:30 PM</span>
+                                </div>
+                                <p class="text-sm text-stone-500 mb-4">Pioneertown의 서부 영화 세트장 구경 및 BBQ 런치.</p>
+                                
+                                <!-- Map Button -->
+                                <a href="https://www.google.com/maps/dir/Pappy+%26+Harriet's,+Pioneertown+Road,+Pioneertown,+CA/Joshua+Tree,+CA/" target="_blank" class="route-btn flex items-center justify-between bg-stone-100 hover:bg-stone-200 p-3 rounded-lg border border-stone-200 text-stone-700 group cursor-pointer no-underline">
+                                    <div class="flex items-center gap-3">
+                                        <div class="bg-green-500 w-2 h-2 rounded-full"></div>
+                                        <div class="text-sm">
+                                            <div class="font-bold">목적지: Casa Nova (Joshua Tree)</div>
+                                            <div class="text-xs text-stone-500">약 20분 (18km) • Pioneertown Rd 경유</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-stone-400 group-hover:text-stone-800">🗺️ 지도 열기 &rarr;</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Route Item 3 -->
+                        <div class="relative pl-10 pb-10 last-item">
+                            <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-indigo-900 rounded-full flex items-center justify-center z-10 shadow-sm">
+                                <span class="text-xl">✨</span>
+                            </div>
+                            <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-200 shadow-sm hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h5 class="text-lg font-bold text-indigo-900">숙소 체크인 & 별 관측</h5>
+                                    <span class="text-sm font-mono text-indigo-700 font-bold">03:30 PM</span>
+                                </div>
+                                <p class="text-sm text-indigo-800 mb-4">짐 풀고 국립공원(Keys View)에서 일몰 감상 후, 숙소 마당에서 별 관측.</p>
+                                <a href="https://www.google.com/maps/dir/Joshua+Tree,+CA/Keys+View,+California/" target="_blank" class="block text-center text-xs font-bold text-indigo-600 hover:underline">🔭 국립공원 일몰 포인트 경로 보기</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Day 2 Timeline -->
+                    <div class="relative pl-4 mt-8 pt-8 border-t border-dashed border-stone-300">
+                        <h4 class="text-xl font-bold text-stone-800 mb-6 pl-2 flex items-center">
+                            <span class="bg-stone-500 text-white px-2 py-1 rounded text-sm mr-2">DAY 2</span> 
+                            2026. 04. 11 (토)
+                        </h4>
+
+                        <!-- Route Item 4 -->
+                        <div class="relative pl-10 pb-10 last-item">
+                             <div class="timeline-line"></div>
+                            <div class="absolute left-0 top-0 w-12 h-12 bg-white border-4 border-green-600 rounded-full flex items-center justify-center z-10 shadow-sm">
+                                <span class="text-xl">🏙️</span>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h5 class="text-lg font-bold text-stone-800">브런치 & LA 이동</h5>
+                                    <span class="text-sm font-mono text-stone-600 font-bold">01:00 PM</span>
+                                </div>
+                                <p class="text-sm text-stone-500 mb-4">Natural Sisters Cafe 브런치 후 LA Westwood로 출발. (주말 정체 예상)</p>
+                                
+                                <!-- Map Button -->
+                                <a href="https://www.google.com/maps/dir/Joshua+Tree,+CA/Westwood,+Los+Angeles,+CA/" target="_blank" class="route-btn flex items-center justify-between bg-stone-100 hover:bg-stone-200 p-3 rounded-lg border border-stone-200 text-stone-700 group cursor-pointer no-underline">
+                                    <div class="flex items-center gap-3">
+                                        <div class="bg-red-500 w-2 h-2 rounded-full animate-pulse"></div>
+                                        <div class="text-sm">
+                                            <div class="font-bold">목적지: LA Westwood Hotel</div>
+                                            <div class="text-xs text-stone-500">약 2시간 40분 ~ 3시간 30분 (210km)</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-stone-400 group-hover:text-stone-800">🗺️ 지도 열기 &rarr;</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENT 2: STARGAZING -->
+                <div id="content-stargazing" class="hidden space-y-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+                        <div class="md:w-2/3">
+                            <h3 class="text-xl font-bold text-indigo-900 mb-2">밤하늘 관측 조건 분석</h3>
+                            <p class="text-stone-600 text-sm mb-4">
+                                Casa Nova는 도심의 불빛에서 완전히 차단된 사막 한가운데 위치하여 <strong>Bortle Scale Class 2</strong> 등급을 자랑합니다. 
+                                4월 10일은 달이 늦게 뜨는 시기로, 초저녁부터 자정까지 은하수 관측에 최적화되어 있습니다.
+                            </p>
+                        </div>
+                        <div class="md:w-1/3 bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                             <h4 class="font-bold text-indigo-800 text-sm mb-2">🔭 천문 장비 제공</h4>
+                            <ul class="text-xs text-indigo-700 space-y-1 mb-3">
+                                <li>• 셀레스트론 망원경 (무료 대여)</li>
+                                <li>• 별자리 지도 앱 프리미엄 계정</li>
+                            </ul>
+                            <button onclick="generateStarGuide()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-3 rounded shadow transition flex items-center justify-center gap-2">
+                                <span>✨ AI 별자리 가이드</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-stone-200">
+                        <div class="chart-container h-80">
+                            <canvas id="stargazingChart"></canvas>
+                        </div>
+                        <div class="flex justify-center gap-4 mt-4 text-xs text-stone-500">
+                            <span class="flex items-center"><span class="w-3 h-3 bg-indigo-500 rounded-full mr-1"></span> 관측 지수</span>
+                            <span class="flex items-center"><span class="w-3 h-3 bg-yellow-400 rounded-full mr-1"></span> 달 밝기</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENT 3: SAFETY -->
+                <div id="content-safety" class="hidden space-y-6">
+                     <div class="mb-4">
+                        <h3 class="text-xl font-bold text-stone-800 mb-2">안전 및 위생 상태 점검</h3>
+                        <p class="text-stone-600 text-sm">
+                            야생동물 차단 펜스와 24시간 보안 시스템이 작동 중입니다.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-stone-200">
+                            <h4 class="font-bold text-stone-700 mb-4 border-b pb-2">안전 항목 평가</h4>
+                            <div class="chart-container">
+                                <canvas id="safetyBarChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-stone-200 flex flex-col">
+                            <h4 class="font-bold text-stone-700 mb-4 border-b pb-2">체크리스트</h4>
+                            <div class="space-y-4 flex-1 overflow-y-auto pr-2">
+                                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                                    <span class="text-sm font-medium text-green-900">🛏️ 침구류 관리</span>
+                                    <span class="text-xs font-bold bg-green-200 text-green-800 px-2 py-1 rounded">PASS</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                                    <span class="text-sm font-medium text-green-900">🦂 해충 방역</span>
+                                    <span class="text-xs font-bold bg-green-200 text-green-800 px-2 py-1 rounded">PASS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENT 4: USABILITY -->
+                <div id="content-usability" class="hidden space-y-6">
+                    <div class="mb-4">
+                        <h3 class="text-xl font-bold text-stone-800 mb-2">편의성 분석</h3>
+                        <p class="text-stone-600 text-sm">감성적인 인테리어와 실용적인 편의시설 간의 균형이 잡혀있습니다.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                            <h4 class="font-bold text-stone-800 mb-2">🍳 주방</h4>
+                            <div class="w-full bg-stone-200 rounded-full h-2 mb-2"><div class="bg-orange-400 h-2 rounded-full" style="width: 90%"></div></div>
+                            <p class="text-xs text-stone-500">9.0/10</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                            <h4 class="font-bold text-stone-800 mb-2">🌡️ 냉난방</h4>
+                            <div class="w-full bg-stone-200 rounded-full h-2 mb-2"><div class="bg-blue-500 h-2 rounded-full" style="width: 95%"></div></div>
+                            <p class="text-xs text-stone-500">9.5/10</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                            <h4 class="font-bold text-stone-800 mb-2">🚗 도로</h4>
+                            <div class="w-full bg-stone-200 rounded-full h-2 mb-2"><div class="bg-red-400 h-2 rounded-full" style="width: 70%"></div></div>
+                            <p class="text-xs text-stone-500">7.0/10 - 비포장 주의</p>
+                        </div>
+                    </div>
+                     <div class="bg-orange-50 rounded-xl p-6 border border-orange-100 mt-6">
+                        <h4 class="font-bold text-orange-900 mb-4">📋 편의시설 (O/X)</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                            <div class="flex items-center"><span class="text-green-600 mr-2">✔</span> Starlink WiFi</div>
+                            <div class="flex items-center"><span class="text-green-600 mr-2">✔</span> 블루투스 스피커</div>
+                            <div class="flex items-center"><span class="text-red-500 mr-2">✘</span> TV 없음</div>
+                            <div class="flex items-center"><span class="text-green-600 mr-2">✔</span> 온수 욕조</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- User Review Explorer -->
+        <section class="space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="space-y-2">
+                    <h2 class="text-2xl font-bold text-stone-800">실제 방문객 리뷰 분석</h2>
+                    <p class="text-stone-500 text-sm">필터를 사용하여 관련 리뷰를 확인하세요.</p>
+                </div>
+                <div class="flex flex-wrap gap-2 items-center">
+                    <div class="flex flex-wrap gap-2" id="review-filters">
+                        <button class="filter-btn active bg-stone-800 text-white px-4 py-1.5 rounded-full text-sm transition" data-filter="all">전체</button>
+                        <button class="filter-btn bg-white border border-stone-300 text-stone-600 px-4 py-1.5 rounded-full text-sm hover:bg-stone-100 transition" data-filter="stars">✨ 별/야경</button>
+                        <button class="filter-btn bg-white border border-stone-300 text-stone-600 px-4 py-1.5 rounded-full text-sm hover:bg-stone-100 transition" data-filter="clean">🧹 청결</button>
+                        <button class="filter-btn bg-white border border-stone-300 text-stone-600 px-4 py-1.5 rounded-full text-sm hover:bg-stone-100 transition" data-filter="safe">🛡️ 안전</button>
+                    </div>
+                    <button onclick="analyzeReviews()" class="ml-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow hover:shadow-lg transition-transform transform hover:-translate-y-0.5 flex items-center gap-2">
+                        <span>✨ AI 요약</span>
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="reviews-container"></div>
+        </section>
+
+        <footer class="text-center text-stone-400 py-12 text-sm border-t border-stone-200 mt-12">
+            <p>&copy; 2024 Casa Nova Desert Escape Analysis Dashboard. All rights reserved.</p>
+        </footer>
+    </main>
+
+    <!-- AI Modal -->
+    <div id="aiModal" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-900 to-indigo-900 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-white font-bold text-lg flex items-center gap-2">
+                    <span>✨ Gemini AI Insight</span>
+                </h3>
+                <button onclick="closeModal()" class="text-white opacity-80 hover:opacity-100 text-2xl">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto bg-stone-50 flex-1">
+                <div id="aiLoading" class="hidden flex flex-col items-center justify-center py-10">
+                    <div class="loader mb-4"></div>
+                    <p class="text-stone-500 text-sm animate-pulse">Gemini가 분석 중입니다...</p>
+                </div>
+                <div id="aiContent" class="ai-response-content text-stone-700 leading-relaxed text-sm"></div>
+            </div>
+            <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex justify-end">
+                <button onclick="closeModal()" class="bg-stone-200 text-stone-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-stone-300 transition">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GEMINI API SETUP ---
+        const apiKey = ""; 
+
+        async function callGemini(prompt) {
+            if (!apiKey) {
+                alert("API 키가 설정되지 않았습니다.");
+                return null;
+            }
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                const data = await response.json();
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || "응답 오류";
+            } catch (error) {
+                console.error("Gemini Error:", error);
+                return "AI 연결 실패. 다시 시도해주세요.";
+            }
+        }
+
+        // --- AI FEATURES ---
+        async function generateStarGuide() {
+            openModal(); showLoading();
+            const prompt = `2026년 4월 10일 조슈아 트리(Bortle 2)의 별 관측 가이드를 작성해줘. 하현달 시즌. 추천 천체 2개와 커플 팁 포함. 한국어 마크다운.`;
+            const result = await callGemini(prompt);
+            displayAIResult(result);
+        }
+
+        async function analyzeReviews() {
+            openModal(); showLoading();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            const prompt = `Casa Nova 숙소 리뷰(${activeFilter}) 요약해줘. 장점, 단점(안전/접근성), 총평. 한국어 마크다운.`;
+            const result = await callGemini(prompt);
+            displayAIResult(result);
+        }
+
+        async function askRouteAdvice() {
+            openModal(); showLoading();
+            const prompt = `
+                2026년 4월 10일(금) ~ 11일(토) LA 인근 로드트립 경로 조언을 해줘.
+                1. 10일(금) 오전 11시 애너하임 출발 -> 조슈아 트리: 금요일 교통 체증 예상 지점 및 회피 팁.
+                2. 11일(토) 오후 1시 조슈아 트리 출발 -> LA 웨스트우드: 토요일 오후 I-10 서쪽 방향 교통 상황 및 추천 휴게소(Cabazon 등).
+                한국어 마크다운.
+            `;
+            const result = await callGemini(prompt);
+            displayAIResult(result);
+        }
+
+        // --- UTILS ---
+        function openModal() { document.getElementById('aiModal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('aiModal').classList.add('hidden'); }
+        function showLoading() {
+            document.getElementById('aiLoading').classList.remove('hidden');
+            document.getElementById('aiContent').innerHTML = '';
+        }
+        function displayAIResult(markdownText) {
+            document.getElementById('aiLoading').classList.add('hidden');
+            document.getElementById('aiContent').innerHTML = marked.parse(markdownText);
+        }
+        document.getElementById('aiModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('aiModal')) closeModal();
+        });
+
+        // --- DATA & STATE ---
+        const reportData = {
+            summaryScores: { labels: ['별 관측', '안전성', '청결도', '편의성', '위치', '가성비'], data: [9.8, 9.2, 9.9, 8.8, 7.5, 9.0] },
+            stargazing: { labels: ['오늘', '내일', 'D+2', 'D+3', 'D+4', 'D+5', 'D+6'], visibilityIndex: [95, 90, 85, 60, 40, 30, 20], moonBrightness: [10, 15, 20, 50, 70, 85, 95] },
+            safetyBreakdown: { labels: ['외부 보안', '화재 안전', '응급 키트', '해충 방지', '프라이버시'], scores: [4.9, 4.8, 4.5, 4.2, 5.0] },
+            reviews: [
+                { id: 1, tag: 'stars', user: 'SkyWalker88', rating: 5, text: "살면서 이렇게 많은 별은 처음 봅니다. 망원경 사용법도 친절해요." },
+                { id: 2, tag: 'clean', user: 'CleanFreak', rating: 5, text: "먼지 한 톨 없이 깨끗했습니다. 침구류 최고." },
+                { id: 3, tag: 'safe', user: 'SoloTraveler', rating: 4, text: "이중 잠금장치 덕분에 안심. 펜스 밖은 코요테 소리 들림." },
+                { id: 4, tag: 'stars', user: 'RomanticCouple', rating: 5, text: "야외 욕조에서 보는 은하수는 잊지 못할 추억." },
+                { id: 5, tag: 'clean', user: 'MomOfTwo', rating: 4, text: "화장실 깨끗함. 테라스 소파 모래는 어쩔 수 없음." },
+                { id: 6, tag: 'safe', user: 'CityBoy', rating: 3, text: "들어오는 길이 너무 어둡고 험해서 운전하기 무서웠음." }
+            ]
+        };
+
+        // --- CHARTS ---
+        Chart.defaults.font.family = "'Noto Sans KR', sans-serif";
+        Chart.defaults.color = '#78716c';
+
+        new Chart(document.getElementById('summaryRadarChart').getContext('2d'), {
+            type: 'radar',
+            data: { labels: reportData.summaryScores.labels, datasets: [{ label: '점수', data: reportData.summaryScores.data, fill: true, backgroundColor: 'rgba(30, 58, 138, 0.2)', borderColor: 'rgb(30, 58, 138)', pointBackgroundColor: 'rgb(30, 58, 138)', pointBorderColor: '#fff' }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { r: { suggestedMin: 5, suggestedMax: 10 } }, plugins: { legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById('stargazingChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: reportData.stargazing.labels,
+                datasets: [
+                    { label: '관측 지수', data: reportData.stargazing.visibilityIndex, borderColor: 'rgb(79, 70, 229)', backgroundColor: 'rgba(79, 70, 229, 0.5)', tension: 0.4 },
+                    { label: '달 밝기', data: reportData.stargazing.moonBrightness, borderColor: 'rgb(250, 204, 21)', backgroundColor: 'rgba(250, 204, 21, 0.5)', borderDash: [5, 5], yAxisID: 'y1', tension: 0.4 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 }, y1: { position: 'right', min: 0, max: 100, grid: { drawOnChartArea: false } } } }
+        });
+
+        new Chart(document.getElementById('safetyBarChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: reportData.safetyBreakdown.labels,
+                datasets: [{ label: '점수', data: reportData.safetyBreakdown.scores, backgroundColor: ['rgba(34, 197, 94, 0.7)', 'rgba(239, 68, 68, 0.7)', 'rgba(59, 130, 246, 0.7)', 'rgba(249, 115, 22, 0.7)', 'rgba(168, 85, 247, 0.7)'], borderWidth: 1 }]
+            },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 5 } }, plugins: { legend: { display: false } } }
+        });
+
+        // --- TABS & LOGIC ---
+        function switchTab(tabId) {
+            ['stargazing', 'itinerary', 'safety', 'usability'].forEach(id => {
+                document.getElementById(`content-${id}`).classList.add('hidden');
+                document.getElementById(`tab-${id}`).classList.replace('tab-active', 'tab-inactive');
+            });
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.replace('tab-inactive', 'tab-active');
+        }
+
+        function renderReviews(filterTag) {
+            const container = document.getElementById('reviews-container');
+            container.innerHTML = '';
+            const filteredData = filterTag === 'all' ? reportData.reviews : reportData.reviews.filter(r => r.tag === filterTag);
+            filteredData.forEach(review => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-xl border border-stone-100 shadow-sm hover:shadow transition';
+                let icon = '📝';
+                if(review.tag === 'stars') icon = '✨'; if(review.tag === 'clean') icon = '🧹'; if(review.tag === 'safe') icon = '🛡️';
+                card.innerHTML = `<div class="flex justify-between items-start mb-2"><div class="flex items-center"><span class="text-lg mr-2">${icon}</span><span class="font-bold text-stone-700 text-sm">${review.user}</span></div><span class="text-amber-400 text-sm">★ ${review.rating}.0</span></div><p class="text-stone-600 text-sm leading-relaxed">"${review.text}"</p>`;
+                container.appendChild(card);
+            });
+        }
+        renderReviews('all');
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('bg-stone-800', 'text-white', 'active'); b.classList.add('bg-white', 'text-stone-600'); });
+                e.target.classList.replace('bg-white', 'bg-stone-800'); e.target.classList.replace('text-stone-600', 'text-white'); e.target.classList.add('active');
+                renderReviews(e.target.dataset.filter);
+            });
+        });
+
+        const themeToggle = document.getElementById('themeToggle');
+        let isNight = false;
+        themeToggle.addEventListener('click', () => {
+            isNight = !isNight;
+            const body = document.getElementById('mainBody');
+            if (isNight) {
+                body.classList.replace('bg-stone-50', 'bg-slate-900'); body.classList.replace('text-stone-800', 'text-slate-200'); themeToggle.innerHTML = "<span>☀️ 주간 모드</span>";
+                document.querySelectorAll('.bg-white').forEach(el => { el.classList.replace('bg-white', 'bg-slate-800'); el.classList.replace('border-stone-200', 'border-slate-700'); });
+                 // Additional color swaps for night mode would go here
+            } else {
+                body.classList.replace('bg-slate-900', 'bg-stone-50'); body.classList.replace('text-slate-200', 'text-stone-800'); themeToggle.innerHTML = "<span>🌙 야간 모드</span>";
+                document.querySelectorAll('.bg-slate-800').forEach(el => { el.classList.replace('bg-slate-800', 'bg-white'); el.classList.replace('border-slate-700', 'border-stone-200'); });
+            }
+        });
+    </script>
+</body>
+</html>

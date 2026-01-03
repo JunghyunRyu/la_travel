@@ -76,15 +76,21 @@
                 <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">렌터카 이동</span>
                 <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">안전 지역 위주</span>
                 <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">아이 맞춤형</span>
-                <a href="la_family_trip_planner.html" class="ml-2 bg-amber-500 hover:bg-amber-600 text-white text-sm px-4 py-2 rounded-lg transition-colors font-medium">
+                <a href="joshua.html" class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-lg transition-colors font-medium">
+                    🏜️ 조슈아트리 숙소
+                </a>
+                <a href="la_family_trip_planner.html" class="bg-amber-500 hover:bg-amber-600 text-white text-sm px-4 py-2 rounded-lg transition-colors font-medium">
                     📅 전체 일정 보기
                 </a>
             </div>
         </div>
         <!-- Mobile Navigation -->
-        <div class="md:hidden px-4 pb-3">
-            <a href="la_family_trip_planner.html" class="block w-full text-center bg-amber-500 hover:bg-amber-600 text-white text-sm px-4 py-2 rounded-lg transition-colors font-medium">
-                📅 전체 일정 보기 (4/7 ~ 4/14)
+        <div class="md:hidden px-4 pb-3 flex gap-2">
+            <a href="joshua.html" class="flex-1 text-center bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-3 py-2 rounded-lg transition-colors font-medium">
+                🏜️ 조슈아트리
+            </a>
+            <a href="la_family_trip_planner.html" class="flex-1 text-center bg-amber-500 hover:bg-amber-600 text-white text-sm px-3 py-2 rounded-lg transition-colors font-medium">
+                📅 전체 일정
             </a>
         </div>
     </header>
@@ -168,6 +174,93 @@
                 </div>
             </div>
 
+        </div>
+
+        <!-- Accommodation & Map Section -->
+        <div class="lg:col-span-12 mt-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Hotel Info Card -->
+                <div class="bg-white p-6 rounded-xl card-shadow">
+                    <h3 class="font-bold text-gray-800 text-lg mb-4">🏨 숙소 정보 (Royal Palace Westwood)</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 flex-shrink-0">
+                                <span class="text-lg">📍</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">1052 Tiverton Avenue</p>
+                                <p class="text-sm text-gray-500">Los Angeles, CA 90024</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600 flex-shrink-0">
+                                <span class="text-lg">📅</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">4월 11일 ~ 14일 (3박)</p>
+                                <p class="text-sm text-gray-500">체크인 15:00 / 체크아웃 11:00</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 flex-shrink-0">
+                                <span class="text-lg">✨</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">주요 편의시설</p>
+                                <p class="text-sm text-gray-500">무료 주차, 전자레인지, 냉장고, 퀸베드 2개</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
+                        <a href="https://www.booking.com/hotel/us/royal-palace-westwood.html" target="_blank"
+                           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors">
+                            <span class="mr-1">🔗</span> Booking.com
+                        </a>
+                        <a href="https://www.expedia.com/Los-Angeles-Hotels-Royal-Palace-Westwood.h9083.Hotel-Information" target="_blank"
+                           class="inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded-lg transition-colors">
+                            <span class="mr-1">🔗</span> Expedia
+                        </a>
+                        <a href="https://www.google.com/maps/place/Royal+Palace+Westwood/@34.0628,-118.4467,17z" target="_blank"
+                           class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors">
+                            <span class="mr-1">📍</span> Google Maps
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Map Embed -->
+                <div class="bg-white p-4 rounded-xl card-shadow">
+                    <h3 class="font-bold text-gray-800 text-lg mb-3">🗺️ 호텔 위치 & 주변 지도</h3>
+                    <div class="rounded-lg overflow-hidden border border-gray-200">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3305.1!2d-118.4467!3d34.0628!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c2bc85896d0e93%3A0x5f0b0f2b0f9c7d1a!2s1052%20Tiverton%20Ave%2C%20Los%20Angeles%2C%20CA%2090024!5e0!3m2!1sen!2sus!4v1704067200000!5m2!1sen!2sus"
+                            width="100%"
+                            height="280"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                    <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+                        <a href="https://www.google.com/maps/dir//UCLA/@34.0689,-118.4452,15z" target="_blank"
+                           class="flex items-center justify-center gap-1 p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                            <span>🎓</span> UCLA (도보 10분)
+                        </a>
+                        <a href="https://www.google.com/maps/dir//Trader+Joe's,+1000+Glendon+Ave,+Los+Angeles,+CA" target="_blank"
+                           class="flex items-center justify-center gap-1 p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                            <span>🛒</span> Trader Joe's (도보 5분)
+                        </a>
+                        <a href="https://www.google.com/maps/dir//UCLA+Medical+Center/@34.0667,-118.4456,16z" target="_blank"
+                           class="flex items-center justify-center gap-1 p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                            <span>🏥</span> UCLA 병원 (도보 8분)
+                        </a>
+                        <a href="https://www.google.com/maps/dir//Westwood+Recreation+Center/@34.0526,-118.4396,16z" target="_blank"
+                           class="flex items-center justify-center gap-1 p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                            <span>🛝</span> Aidan's Place (차 5분)
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Safety & Driving Info (Bottom Full Width) -->
