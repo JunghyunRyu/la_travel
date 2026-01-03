@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LA Family Travel Planner (Corrected)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #FDFCF8;
+            color: #2D3748;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            margin: 0 auto;
+        }
+        .timeline-line {
+            position: absolute;
+            left: 24px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #E2E8F0;
+            z-index: 0;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .active-tab {
+            border-bottom: 3px solid #ED8936;
+            color: #C05621;
+            font-weight: 700;
+        }
+        .inactive-tab {
+            color: #718096;
+            border-bottom: 3px solid transparent;
+        }
+        .inactive-tab:hover {
+            color: #4A5568;
+            border-bottom: 3px solid #CBD5E0;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <!-- Chosen Palette: Warm California (Sand, Sunset Orange, Ocean Blue, Sage) -->
+    <!-- Application Structure Plan: Dashboard (Summary) -> Tabs (Itinerary, Budget, Checklist, Route) -> Detail Modals. Updated specifically for Tuesday-Tuesday schedule. -->
+    <!-- Visualization & Content Choices: Pie Chart for Budget, Timeline for Schedule. No SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-plane-departure text-orange-500 text-xl"></i>
+                <h1 class="text-lg font-bold text-gray-800">LA 가족 여행 <span class="text-xs font-normal text-gray-500 ml-1">4.7(화) - 4.15(수) 도착</span></h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="index.html" class="text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full transition-colors">
+                    <i class="fas fa-map mr-1"></i>LA 상세
+                </a>
+                <div class="text-sm text-gray-600 font-medium bg-green-100 px-3 py-1 rounded-full text-green-700">
+                    <i class="fas fa-check-circle mr-1"></i>일정 확정
+                </div>
+            </div>
+        </div>
+        <!-- Navigation Tabs -->
+        <nav class="max-w-3xl mx-auto px-4 mt-2">
+            <div class="flex space-x-6 overflow-x-auto no-scrollbar">
+                <button onclick="switchTab('itinerary')" id="tab-itinerary" class="active-tab pb-2 whitespace-nowrap transition-colors">
+                    <i class="far fa-calendar-alt mr-1"></i> 일정 상세
+                </button>
+                <button onclick="switchTab('budget')" id="tab-budget" class="inactive-tab pb-2 whitespace-nowrap transition-colors">
+                    <i class="fas fa-coins mr-1"></i> 예산 계획
+                </button>
+                <button onclick="switchTab('checklist')" id="tab-checklist" class="inactive-tab pb-2 whitespace-nowrap transition-colors">
+                    <i class="fas fa-clipboard-check mr-1"></i> 체크리스트
+                </button>
+                <button onclick="switchTab('info')" id="tab-info" class="inactive-tab pb-2 whitespace-nowrap transition-colors">
+                    <i class="fas fa-info-circle mr-1"></i> 여행 정보
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-3xl mx-auto w-full px-4 py-6 space-y-6">
+
+        <!-- CONTENT SECTION: Itinerary -->
+        <section id="content-itinerary" class="animate-fade-in">
+            <!-- Schedule Note -->
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r mb-6 shadow-sm">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-double text-green-500"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-green-700 font-bold">일정 최적화 완료</p>
+                        <p class="text-xs text-green-600 mt-1">
+                            출국일이 화요일(14일)이므로, 요청하신 대로 
+                            <span class="font-bold underline">월요일(13일) 유니버셜 스튜디오 방문</span>이 완벽하게 가능합니다.
+                            주말 인파를 피해 평일(월요일)에 방문하여 대기 시간을 줄일 수 있습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Selector (Horizontal Scroll) -->
+            <div class="flex space-x-3 overflow-x-auto no-scrollbar mb-6 pb-2" id="day-selector">
+                <!-- Javascript will populate this -->
+            </div>
+
+            <!-- Timeline Container -->
+            <div id="timeline-container" class="relative pl-2">
+                <!-- Javascript will populate this -->
+            </div>
+        </section>
+
+        <!-- CONTENT SECTION: Budget -->
+        <section id="content-budget" class="hidden animate-fade-in">
+            <div class="glass-card p-6 rounded-xl mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-2">예상 총 비용</h2>
+                <div class="flex items-end items-baseline space-x-2">
+                    <span class="text-4xl font-extrabold text-orange-500" id="total-cost">₩0</span>
+                    <span class="text-sm text-gray-500">(성인2, 소아1 기준)</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-2">*항공권 제외 현지 체류 비용 추산 (환율 1,350원 기준)</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-700 mb-4 text-center">비용 구성</h3>
+                    <div class="chart-container">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-700 mb-3">옵션 조정</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                                    <span>식비 레벨 (일일)</span>
+                                    <span class="text-orange-500" id="food-level-display">Standard</span>
+                                </label>
+                                <input type="range" id="food-slider" min="1" max="3" value="2" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500">
+                                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                    <span>알뜰</span>
+                                    <span>적정</span>
+                                    <span>고급</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">지니 플러스 (디즈니) 추가</span>
+                                <button id="genie-toggle" class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+                                    <span class="translate-x-1 inline-block h-4 w-4 transform rounded-full bg-white transition-transform"></span>
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">익스프레스 (유니버셜) 추가</span>
+                                <button id="express-toggle" class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+                                    <span class="translate-x-1 inline-block h-4 w-4 transform rounded-full bg-white transition-transform"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
+                        <p class="font-bold text-gray-700">💡 5세 아이 동반 팁</p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1 ml-1">
+                            <li>디즈니: 5세 아이에게 '지니플러스'는 대기 시간을 줄여 체력을 아끼는 최고의 투자입니다.</li>
+                            <li>유니버셜: '닌텐도 월드' 입장 확약을 위해 오픈런 혹은 익스프레스 티켓 구매를 고려하세요.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTENT SECTION: Checklist -->
+        <section id="content-checklist" class="hidden animate-fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="checklist-container">
+                <!-- Javascript will populate -->
+            </div>
+        </section>
+
+        <!-- CONTENT SECTION: Info -->
+        <section id="content-info" class="hidden animate-fade-in space-y-6">
+            
+            <!-- Hotels -->
+            <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">🏨 숙소 정보</h3>
+                <div class="space-y-4">
+                    <div class="flex">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-500 mr-4 flex-shrink-0">
+                            <i class="fas fa-castle"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-700">Hotel Alpine Inn</h4>
+                            <p class="text-sm text-gray-500">애너하임 (4/7 ~ 4/10, 3박)</p>
+                            <p class="text-xs text-orange-500 mt-1">장점: 디즈니랜드 입구까지 도보 이동 가능, 가성비 우수</p>
+                        </div>
+                    </div>
+                    <div class="flex">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-green-500 mr-4 flex-shrink-0">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-700">조슈아트리 (미정)</h4>
+                            <p class="text-sm text-gray-500">조슈아트리 (4/10 ~ 4/11, 1박)</p>
+                            <p class="text-xs text-gray-400 mt-1">추천: 29 Palms 지역의 호텔이 국립공원 북쪽 입구와 가깝습니다.</p>
+                        </div>
+                    </div>
+                    <div class="flex">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-500 mr-4 flex-shrink-0">
+                            <i class="fas fa-city"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-700">Royal Palace Westwood</h4>
+                            <p class="text-sm text-gray-500">웨스트우드 (4/11 ~ 4/14, 3박)</p>
+                            <p class="text-xs text-gray-400 mt-1">위치: UCLA 인근. 유니버셜 스튜디오 및 공항 이동에 용이한 중간 지점입니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drive Info -->
+            <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">🚗 이동 경로 요약</h3>
+                <div class="space-y-4 relative">
+                    <div class="absolute left-2.5 top-2 bottom-2 w-0.5 bg-gray-200"></div>
+                    
+                    <div class="relative pl-8">
+                        <div class="absolute left-0 top-1 w-5 h-5 bg-orange-500 rounded-full border-4 border-white z-10"></div>
+                        <h5 class="font-bold text-sm">LAX 공항 ➔ 애너하임 (화)</h5>
+                        <p class="text-sm text-gray-600">오후 3시경 출발 예상. 퇴근 시간 전이라 비교적 원활 (약 45분)</p>
+                    </div>
+                    
+                    <div class="relative pl-8">
+                        <div class="absolute left-0 top-1 w-5 h-5 bg-gray-300 rounded-full border-4 border-white z-10"></div>
+                        <h5 class="font-bold text-sm">애너하임 ➔ 조슈아트리 (금)</h5>
+                        <p class="text-sm text-gray-600">오전 10시 출발 추천. (약 2시간)</p>
+                    </div>
+
+                    <div class="relative pl-8">
+                        <div class="absolute left-0 top-1 w-5 h-5 bg-gray-300 rounded-full border-4 border-white z-10"></div>
+                        <h5 class="font-bold text-sm">조슈아트리 ➔ 웨스트우드 (토)</h5>
+                        <p class="text-sm text-gray-600">주말 LA 진입 교통량 많음. (약 2시간 30분)</p>
+                    </div>
+
+                    <div class="relative pl-8">
+                        <div class="absolute left-0 top-1 w-5 h-5 bg-blue-500 rounded-full border-4 border-white z-10"></div>
+                        <h5 class="font-bold text-sm">웨스트우드 ➔ 유니버셜 (월)</h5>
+                        <p class="text-sm text-gray-600">약 20~30분 거리. 매우 가까움.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-6 mt-auto">
+        <p class="text-sm text-gray-400 mb-2">Safe Travels!</p>
+        <p class="text-xs text-gray-600">Generated for April 2026 Trip Plan</p>
+    </footer>
+
+    <!-- Javascript Application Logic -->
+    <script>
+        // --- DATA STORE ---
+        // Date Correction: 4/7 is Tuesday, 4/14 is Tuesday.
+        const tripData = {
+            startDate: new Date('2026-04-07T14:50:00'),
+            endDate: new Date('2026-04-14T12:30:00'),
+            dates: [
+                { date: '4/7', day: '화', id: 'd1', title: 'LA 도착 및 애너하임', location: 'Anaheim' },
+                { date: '4/8', day: '수', id: 'd2', title: '디즈니랜드 파크', location: 'Disneyland' },
+                { date: '4/9', day: '목', id: 'd3', title: '캘리포니아 어드벤처', location: 'Disneyland' },
+                { date: '4/10', day: '금', id: 'd4', title: '조슈아트리 이동', location: 'Joshua Tree' },
+                { date: '4/11', day: '토', id: 'd5', title: 'LA 시내 이동', location: 'Westwood' },
+                { date: '4/12', day: '일', id: 'd6', title: '산타모니카 & 휴식', location: 'LA City' },
+                { date: '4/13', day: '월', id: 'd7', title: '유니버셜 스튜디오', location: 'Universal City' },
+                { date: '4/14', day: '화', id: 'd8', title: '출국 (LAX -> ICN)', location: 'LAX Airport' }
+            ],
+            schedule: {
+                'd1': [
+                    { time: '14:50', title: 'LAX 공항 도착', icon: 'fa-plane-arrival', desc: '입국 수속(1시간 소요 예상). 렌터카 셔틀 탑승.' },
+                    { time: '16:30', title: '렌터카 픽업', icon: 'fa-car', desc: '카시트 장착 확인. 애너하임으로 이동 (약 45분~1시간).' },
+                    { time: '18:00', title: '체크인 & 저녁', icon: 'fa-hotel', desc: 'Alpine Inn 체크인. 인근 IHOP이나 Denny\'s에서 저녁 식사.' },
+                    { time: '19:30', title: '월그린/타겟 쇼핑', icon: 'fa-shopping-basket', desc: '물, 간식, 다음날 아침거리 구매.' }
+                ],
+                'd2': [
+                    { time: '08:00', title: '디즈니랜드 파크', icon: 'fa-fort-awesome', desc: '오픈런 권장. 5세 아이 추천: 잇츠 어 스몰 월드, 덤보, 피터팬.' },
+                    { time: '14:00', title: '호텔 휴식 (선택)', icon: 'fa-bed', desc: '호텔이 가까우므로 낮잠 후 재입장 추천.' },
+                    { time: '21:30', title: '불꽃놀이', icon: 'fa-magic', desc: '메인 스트리트나 성 앞 점령.' }
+                ],
+                'd3': [
+                    { time: '08:00', title: '캘리포니아 어드벤처', icon: 'fa-ticket-alt', desc: '카 랜드(Cars Land)가 하이라이트. 라이트닝 맥퀸과 사진 찍기.' },
+                    { time: '12:00', title: '점심 식사', icon: 'fa-utensils', desc: 'Pym Test Kitchen 등 테마 식당 이용.' },
+                    { time: '21:00', title: 'World of Color', icon: 'fa-water', desc: '분수쇼 관람 (오전 중 앱으로 가상 대기열 등록 필수).' }
+                ],
+                'd4': [
+                    { time: '10:00', title: '조슈아트리로 이동', icon: 'fa-road', desc: '체크아웃 후 출발 (약 2시간 소요). 데저트 힐스 아울렛 경유 가능.' },
+                    { time: '13:00', title: '점심 & 공원 입장', icon: 'fa-tree', desc: '입구 비지터 센터 방문. 스컬 록(Skull Rock) 구경.' },
+                    { time: '16:00', title: '숙소 체크인', icon: 'fa-home', desc: '에어비앤비 혹은 호텔 체크인. 바베큐 파티 준비.' },
+                    { time: '20:00', title: '별 관측', icon: 'fa-star', desc: '쏟아지는 별 구경.' }
+                ],
+                'd5': [
+                    { time: '10:00', title: 'LA로 이동', icon: 'fa-car-side', desc: '웨스트우드(Royal Palace Westwood)로 이동. 주말이라 교통량 많음 주의.' },
+                    { time: '13:00', title: '게티 센터', icon: 'fa-landmark', desc: '아이들이 뛰어놀기 좋은 정원. 트램 탑승. (입장료 무료, 주차비 유료)' },
+                    { time: '18:00', title: '체크인 & UCLA 산책', icon: 'fa-university', desc: '호텔 체크인 후 안전한 대학가 주변 산책 및 저녁.' }
+                ],
+                'd6': [
+                    { time: '10:00', title: '산타모니카 피어', icon: 'fa-umbrella-beach', desc: '바닷가 모래놀이. 퍼시픽 파크 관람차 탑승.' },
+                    { time: '15:00', title: '그로브 몰 / 파머스 마켓', icon: 'fa-shopping-bag', desc: '아이쇼핑 및 트롤리 탑승. 저녁 식사 해결.' },
+                    { time: '19:00', title: '휴식', icon: 'fa-moon', desc: '다음날 유니버셜 스튜디오를 위해 체력 비축.' }
+                ],
+                'd7': [
+                    { time: '09:00', title: '유니버셜 스튜디오', icon: 'fa-film', desc: '월요일이라 주말보다 쾌적. 닌텐도 월드 직행. 스튜디오 투어 버스 탑승.' },
+                    { time: '13:00', title: '심슨 라이드 등', icon: 'fa-smile', desc: '아이가 탈 수 있는 놀이기구 위주 공략 (키 제한 확인).' },
+                    { time: '18:00', title: '시티 워크', icon: 'fa-hamburger', desc: '부바 검프 등에서 마지막 저녁 식사.' }
+                ],
+                'd8': [
+                    { time: '09:00', title: '공항으로 이동', icon: 'fa-suitcase', desc: '웨스트우드에서 공항 가깝지만(30분), 렌터카 반납 시간 고려하여 여유있게 출발.' },
+                    { time: '10:00', title: '렌터카 반납', icon: 'fa-undo', desc: '차량 반납 후 셔틀로 공항 터미널 이동.' },
+                    { time: '12:30', title: '인천행 출발', icon: 'fa-plane-departure', desc: '즐거운 추억을 안고 귀국. (한국 도착 4/15 17:50)' }
+                ]
+            },
+            checklist: [
+                { category: '필수 서류', items: ['여권 (유효기간 6개월 이상)', 'ESTA 승인서 출력', '항공권 E-Ticket', '호텔/렌터카 바우처', '국제면허증 & 한국면허증'] },
+                { category: '5세 아이 용품', items: ['휴대용 유모차 (필수)', '비상약 (해열제/체온계)', '선글라스/모자/선크림', '긴팔 외투 (사막/밤 추위 대비)', '차량용 햇빛 가리개'] },
+                { category: '기타 준비물', items: ['미국 유심/로밍', '돼지코(110v 어댑터)', '보조 배터리', '디즈니/유니버셜 앱 다운로드', '우버 앱 카드등록'] }
+            ],
+            costs: {
+                base: { tickets: 1300000, accom: 1600000, transport: 700000, food: 900000, misc: 400000 }, 
+                options: { genie: 160000, express: 450000 }
+            }
+        };
+
+        // --- STATE MANAGEMENT ---
+        let state = {
+            activeTab: 'itinerary',
+            selectedDayId: 'd1',
+            foodLevel: 2,
+            hasGenie: false,
+            hasExpress: false
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDaySelector();
+            renderItinerary(state.selectedDayId);
+            renderChecklist();
+            initBudgetChart();
+            setupEventListeners();
+        });
+
+        // --- CORE FUNCTIONS ---
+        function switchTab(tabId) {
+            ['itinerary', 'budget', 'checklist', 'info'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const content = document.getElementById(`content-${t}`);
+                if (t === tabId) {
+                    btn.classList.remove('inactive-tab');
+                    btn.classList.add('active-tab');
+                    content.classList.remove('hidden');
+                } else {
+                    btn.classList.add('inactive-tab');
+                    btn.classList.remove('active-tab');
+                    content.classList.add('hidden');
+                }
+            });
+            state.activeTab = tabId;
+        }
+
+        // --- ITINERARY LOGIC ---
+        function renderDaySelector() {
+            const container = document.getElementById('day-selector');
+            container.innerHTML = tripData.dates.map(d => `
+                <button onclick="selectDay('${d.id}')" 
+                    class="day-btn flex-shrink-0 w-16 h-20 rounded-xl flex flex-col items-center justify-center border-2 transition-all ${state.selectedDayId === d.id ? 'border-orange-500 bg-orange-50 text-orange-600 shadow-md' : 'border-gray-200 bg-white text-gray-400 hover:border-orange-200'}">
+                    <span class="text-xs font-bold mb-1">${d.date}</span>
+                    <span class="text-lg font-bold">${d.day}</span>
+                    ${d.id === 'd7' ? '<span class="text-[10px] text-red-500 mt-1">★</span>' : ''}
+                </button>
+            `).join('');
+        }
+
+        function selectDay(dayId) {
+            state.selectedDayId = dayId;
+            renderDaySelector();
+            renderItinerary(dayId);
+        }
+
+        function renderItinerary(dayId) {
+            const container = document.getElementById('timeline-container');
+            const dayData = tripData.dates.find(d => d.id === dayId);
+            const events = tripData.schedule[dayId];
+
+            let html = `
+                <div class="timeline-line"></div>
+                <div class="mb-6 ml-8">
+                    <h2 class="text-2xl font-bold text-gray-800">${dayData.title}</h2>
+                    <p class="text-gray-500"><i class="fas fa-map-marker-alt text-orange-500 mr-2"></i>${dayData.location}</p>
+                </div>
+            `;
+
+            html += events.map((event, index) => `
+                <div class="relative ml-8 mb-8 group">
+                    <!-- Dot -->
+                    <div class="absolute -left-[41px] top-1 w-8 h-8 rounded-full border-4 border-white bg-orange-100 flex items-center justify-center shadow-sm z-10 group-hover:scale-110 transition-transform">
+                        <i class="fas ${event.icon} text-orange-500 text-xs"></i>
+                    </div>
+                    
+                    <!-- Content Card -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-mono">${event.time}</span>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-800 mb-1">${event.title}</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">${event.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        // --- CHECKLIST LOGIC ---
+        function renderChecklist() {
+            const container = document.getElementById('checklist-container');
+            container.innerHTML = tripData.checklist.map(cat => `
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-700 mb-3 border-b pb-2">${cat.category}</h3>
+                    <ul class="space-y-2">
+                        ${cat.items.map(item => `
+                            <li class="flex items-center text-sm text-gray-600 cursor-pointer hover:text-orange-600 transition-colors" onclick="this.classList.toggle('line-through'); this.classList.toggle('text-gray-300')">
+                                <i class="far fa-square mr-3 text-gray-300 check-icon"></i>
+                                <span>${item}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+
+        // --- BUDGET LOGIC ---
+        let budgetChartInstance = null;
+
+        function updateBudget() {
+            // Food cost calculation: Base 900k * multiplier
+            const foodMultipliers = [0.7, 1.0, 1.5];
+            const foodCost = tripData.costs.base.food * foodMultipliers[state.foodLevel - 1];
+            
+            // Options
+            const genieCost = state.hasGenie ? tripData.costs.options.genie : 0;
+            const expressCost = state.hasExpress ? tripData.costs.options.express : 0;
+            
+            const ticketsCost = tripData.costs.base.tickets + genieCost + expressCost;
+            
+            const total = tripData.costs.base.accom + tripData.costs.base.transport + tripData.costs.base.misc + foodCost + ticketsCost;
+            
+            // Update Text
+            document.getElementById('total-cost').innerText = '₩' + total.toLocaleString();
+            document.getElementById('food-level-display').innerText = ['알뜰', '표준', '여유'][state.foodLevel - 1];
+
+            // Update Chart
+            const data = [
+                tripData.costs.base.accom, 
+                ticketsCost, 
+                foodCost, 
+                tripData.costs.base.transport, 
+                tripData.costs.base.misc
+            ];
+
+            if (budgetChartInstance) {
+                budgetChartInstance.data.datasets[0].data = data;
+                budgetChartInstance.update();
+            }
+        }
+
+        function initBudgetChart() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            
+            budgetChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['숙박 (7박)', '티켓/입장권', '식비', '교통/렌트', '쇼핑/기타'],
+                    datasets: [{
+                        data: [1600000, 1300000, 900000, 700000, 400000],
+                        backgroundColor: ['#4299E1', '#F6AD55', '#68D391', '#A0AEC0', '#ED64A6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { usePointStyle: true, boxWidth: 8, font: { size: 11, family: "'Noto Sans KR', sans-serif" } }
+                        }
+                    }
+                }
+            });
+            updateBudget();
+        }
+
+        function setupEventListeners() {
+            // Slider
+            const slider = document.getElementById('food-slider');
+            slider.addEventListener('input', (e) => {
+                state.foodLevel = parseInt(e.target.value);
+                updateBudget();
+            });
+
+            // Toggles
+            const createToggleHandler = (id, stateKey) => {
+                const btn = document.getElementById(id);
+                btn.addEventListener('click', () => {
+                    state[stateKey] = !state[stateKey];
+                    updateBudget();
+                    
+                    // UI Update
+                    const span = btn.querySelector('span');
+                    if (state[stateKey]) {
+                        btn.classList.remove('bg-gray-200');
+                        btn.classList.add('bg-orange-500');
+                        span.classList.remove('translate-x-1');
+                        span.classList.add('translate-x-6');
+                    } else {
+                        btn.classList.add('bg-gray-200');
+                        btn.classList.remove('bg-orange-500');
+                        span.classList.add('translate-x-1');
+                        span.classList.remove('translate-x-6');
+                    }
+                });
+            };
+
+            createToggleHandler('genie-toggle', 'hasGenie');
+            createToggleHandler('express-toggle', 'hasExpress');
+        }
+
+    </script>
+</body>
+</html>
